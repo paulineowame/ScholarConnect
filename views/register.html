@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — ScholarConnect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--card); }
+    .reg-wrap {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 100px 20px 60px;
+    }
+    .reg-header { text-align: center; margin-bottom: 52px; }
+    .reg-header .logo { font-size: 1.7rem; margin-bottom: 24px; display: block; }
+    .reg-header h2 { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--navy); margin-bottom: 10px; }
+    .reg-header p { color: var(--muted); font-size: 0.97rem; }
+
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 760px; width: 100%; }
+
+    .choice-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 44px 36px;
+      text-align: center;
+      text-decoration: none;
+      display: flex; flex-direction: column; align-items: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .choice-card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 20px 60px rgba(37,87,167,0.13); }
+    .choice-card.student:hover { border-color: var(--accent); }
+    .choice-card.tutor:hover   { border-color: var(--gold); }
+
+    .choice-icon { font-size: 3.5rem; margin-bottom: 20px; width: 88px; height: 88px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .choice-card.student .choice-icon { background: var(--light); }
+    .choice-card.tutor   .choice-icon { background: #fef9c3; }
+
+    .choice-card h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--navy); margin-bottom: 10px; }
+    .choice-card p  { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 28px; }
+
+    .choice-bullets { list-style: none; text-align: left; width: 100%; margin-bottom: 32px; display: flex; flex-direction: column; gap: 8px; }
+    .choice-bullets li { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text); }
+    .choice-bullets li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+    .choice-btn { display: block; width: 100%; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 0.95rem; font-family: 'DM Sans', sans-serif; border: none; cursor: pointer; transition: all 0.2s; }
+    .choice-card.student .choice-btn { background: var(--accent); color: var(--white); }
+    .choice-card.student .choice-btn:hover { background: var(--mid); }
+    .choice-card.tutor .choice-btn   { background: var(--gold); color: var(--navy); }
+    .choice-card.tutor .choice-btn:hover { background: #d97706; color: var(--white); }
+
+    .login-link { margin-top: 36px; text-align: center; color: var(--muted); font-size: 0.88rem; }
+    .login-link a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+    @media (max-width: 600px) { .choice-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Scholar<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/login">Sign In</a></li>
+  </ul>
+</nav>
+
+<div class="reg-wrap">
+  <div class="reg-header fade-up">
+    <h2>Create Your Account</h2>
+    <p>Choose how you want to use ScholarConnect</p>
+  </div>
+
+  <div class="choice-grid fade-up delay-1">
+
+    <!-- STUDENT -->
+    <a href="/register/student" class="choice-card student">
+      <div class="choice-icon">🎒</div>
+      <h3>I'm a Student</h3>
+      <p>Find verified tutors and get the academic help you need — on your schedule.</p>
+      <ul class="choice-bullets">
+        <li>Search tutors by subject & location</li>
+        <li>Book sessions online or in-person</li>
+        <li>Rate and review your tutors</li>
+        <li>Free to join</li>
+      </ul>
+      <span class="choice-btn">Register as Student →</span>
+    </a>
+
+    <!-- TUTOR -->
+    <a href="/register/tutor" class="choice-card tutor">
+      <div class="choice-icon">👩🏾‍🏫</div>
+      <h3>I'm a Tutor</h3>
+      <p>Share your knowledge, earn flexible income and build a student base across Botswana.</p>
+      <ul class="choice-bullets">
+        <li>Set your own rates & availability</li>
+        <li>Get matched with students instantly</li>
+        <li>Build a verified tutor profile</li>
+        <li>Avg. P2,500/month earnings</li>
+      </ul>
+      <span class="choice-btn">Register as Tutor →</span>
+    </a>
+
+  </div>
+
+  <p class="login-link fade-up delay-2">Already have an account? <a href="/login">Sign in here</a></p>
+</div>
+
+<script src="/js/utils.js"></script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Dashboard — ScholarConnect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--card); }
+    .dash-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; padding-top: 68px; }
+
+    .dash-sidebar { background: var(--white); border-right: 1px solid var(--border); padding: 28px 0; position: sticky; top: 68px; height: calc(100vh - 68px); overflow-y: auto; }
+    .sidebar-user { padding: 0 20px 22px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+    .user-av { width: 50px; height: 50px; background: #fef9c3; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 10px; }
+    .user-name { font-weight: 700; color: var(--navy); font-size: 0.93rem; }
+    .user-role { color: var(--muted); font-size: 0.76rem; margin-top: 2px; }
+    .pending-badge { background: #fef9c3; color: #854d0e; font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 100px; display: inline-block; margin-top: 6px; border: 1px solid #fde68a; }
+    .nav-section { font-size: 0.7rem; font-weight: 700; color: var(--grey); text-transform: uppercase; letter-spacing: 1px; padding: 14px 20px 5px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; color: var(--muted); font-size: 0.87rem; font-weight: 500; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; background: none; border-top: none; border-right: none; border-bottom: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; position: relative; }
+    .nav-item:hover { background: var(--card); color: var(--navy); }
+    .nav-item.active { background: #fef9c3; color: #854d0e; border-left-color: var(--gold); font-weight: 600; }
+    .nav-item .ni { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge { background: var(--accent); color: var(--white); font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 100px; margin-left: auto; }
+
+    .dash-main { padding: 36px 40px; min-width: 0; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp 0.35s ease; }
+
+    /* Overview */
+    .dash-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+    .dash-header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--navy); margin-bottom: 4px; }
+    .dash-header p { color: var(--muted); font-size: 0.9rem; }
+    .approval-banner { background: #fef9c3; border: 1px solid #fde68a; border-radius: 13px; padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    .approval-banner .ab-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .approval-banner h4 { font-size: 0.87rem; font-weight: 700; color: #854d0e; margin-bottom: 2px; }
+    .approval-banner p  { font-size: 0.8rem; color: #92400e; }
+    .stat-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+    .stat-card .s-icon { font-size: 1.4rem; margin-bottom: 10px; }
+    .stat-card .s-val  { font-size: 1.5rem; font-weight: 700; color: var(--navy); font-family: 'Playfair Display', serif; }
+    .stat-card .s-lbl  { color: var(--muted); font-size: 0.78rem; margin-top: 3px; }
+    .stat-card .s-note { font-size: 0.73rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+    .dash-grid { display: grid; grid-template-columns: 1fr 290px; gap: 22px; }
+    .panel { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .panel-title { font-size: 0.97rem; font-weight: 700; color: var(--navy); margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+    .panel-title button { font-size: 0.8rem; color: var(--accent); background: none; border: none; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+    /* Request items (overview preview) */
+    .req-item { display: flex; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .req-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .req-av { width: 38px; height: 38px; border-radius: 50%; background: var(--light); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .req-info h4 { font-size: 0.87rem; font-weight: 600; color: var(--navy); }
+    .req-info p  { color: var(--muted); font-size: 0.76rem; margin-top: 2px; }
+    .req-actions { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-confirm { background: #dcfce7; color: #166534; border: none; border-radius: 7px; padding: 6px 11px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-confirm:hover { background: #bbf7d0; }
+    .btn-decline { background: #fee2e2; color: #991b1b; border: none; border-radius: 7px; padding: 6px 11px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .btn-decline:hover { background: #fecaca; }
+
+    /* Earnings chart */
+    .earn-chart { display: flex; align-items: flex-end; gap: 8px; height: 90px; margin-bottom: 12px; }
+    .bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .bar { background: var(--light); border-radius: 5px 5px 0 0; width: 100%; transition: height 0.5s; }
+    .bar.filled { background: var(--gold); }
+    .bar-lbl { font-size: 0.68rem; color: var(--muted); }
+
+    /* Profile panel */
+    .profile-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 13px; }
+    .profile-row .pr-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .profile-row h4 { font-size: 0.84rem; font-weight: 600; color: var(--navy); margin-bottom: 1px; }
+    .profile-row p  { font-size: 0.77rem; color: var(--muted); }
+    .status-tag { background: #fef9c3; color: #854d0e; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 100px; border: 1px solid #fde68a; display: inline-block; }
+
+    /* Requests tab */
+    .requests-header { margin-bottom: 24px; }
+    .requests-header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--navy); margin-bottom: 4px; }
+    .requests-header p { color: var(--muted); font-size: 0.9rem; }
+    .request-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 11px; overflow: hidden; margin-bottom: 24px; width: fit-content; }
+    .req-tab { padding: 10px 20px; font-size: 0.85rem; font-weight: 600; color: var(--muted); background: var(--card); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; border-right: 1px solid var(--border); transition: all 0.2s; }
+    .req-tab:last-child { border-right: none; }
+    .req-tab.active { background: var(--white); color: var(--navy); }
+    .requests-list { display: flex; flex-direction: column; gap: 13px; }
+    .request-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 15px; padding: 20px; display: flex; gap: 16px; align-items: center; transition: all 0.2s; }
+    .request-card:hover { box-shadow: 0 6px 24px rgba(37,87,167,0.07); }
+    .request-card.new-req { border-color: #fde68a; background: #fffdf0; }
+    .rc-av { width: 48px; height: 48px; border-radius: 50%; background: var(--light); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .rc-info { flex: 1; }
+    .rc-info h4 { font-size: 0.92rem; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+    .rc-info p  { font-size: 0.79rem; color: var(--muted); line-height: 1.5; }
+    .rc-info .rc-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+    .rc-tag { background: var(--light); color: var(--blue); font-size: 0.72rem; padding: 2px 8px; border-radius: 5px; }
+    .rc-actions { display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+
+    /* Sessions tab (tutor) */
+    .sessions-list { display: flex; flex-direction: column; gap: 12px; }
+    .session-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 18px; display: flex; gap: 14px; align-items: center; }
+    .sc-av { width: 44px; height: 44px; border-radius: 50%; background: var(--light); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .sc-info { flex: 1; }
+    .sc-info h4 { font-size: 0.9rem; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+    .sc-info p  { font-size: 0.78rem; color: var(--muted); }
+    .sc-status { font-size: 0.71rem; font-weight: 700; padding: 4px 10px; border-radius: 100px; flex-shrink: 0; }
+    .status-upcoming  { background: #dbeafe; color: #1d4ed8; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .status-pending   { background: #fef9c3; color: #854d0e; }
+
+    @media(max-width:1100px){ .stat-cards{grid-template-columns:repeat(2,1fr);} .dash-grid{grid-template-columns:1fr;} }
+    @media(max-width:900px){ .dash-layout{grid-template-columns:1fr;} .dash-sidebar{display:none;} .dash-main{padding:20px 16px;} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Scholar<span>Connect</span></a>
+  <ul class="nav-links">
+    <li id="nav-username" style="color:var(--grey);font-size:0.88rem;padding:8px 10px;"></li>
+    <li><a href="#" onclick="logout();return false;" style="color:var(--grey);">Sign Out</a></li>
+  </ul>
+</nav>
+
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <div class="sidebar-user">
+      <div class="user-av">👩🏾‍🏫</div>
+      <div class="user-name" id="sb-name">Tutor</div>
+      <div class="user-role">Tutor Account</div>
+      <span class="pending-badge">⏳ Pending Review</span>
+    </div>
+    <div class="nav-section">Main</div>
+    <button class="nav-item active" id="nav-overview"  onclick="showTab('overview',this)"><span class="ni">🏠</span> Dashboard</button>
+    <button class="nav-item"        id="nav-requests"  onclick="showTab('requests',this)"><span class="ni">📩</span> Student Requests <span class="nav-badge">2</span></button>
+    <button class="nav-item"        id="nav-sessions"  onclick="showTab('sessions',this)"><span class="ni">📅</span> My Sessions</button>
+    <button class="nav-item"        onclick="showToast('Messages coming soon!')"><span class="ni">💬</span> Messages</button>
+    <button class="nav-item"        onclick="showToast('Earnings coming soon!')"><span class="ni">💰</span> Earnings</button>
+    <div class="nav-section">Profile</div>
+    <button class="nav-item" onclick="showToast('Profile editing coming soon!')"><span class="ni">👤</span> My Profile</button>
+    <button class="nav-item" onclick="showToast('Availability coming soon!')"><span class="ni">📋</span> Availability</button>
+    <button class="nav-item" onclick="showToast('Settings coming soon!')"><span class="ni">⚙️</span> Settings</button>
+    <button class="nav-item" onclick="logout()"><span class="ni">🚪</span> Sign Out</button>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="dash-header">
+        <div>
+          <h1>Tutor Dashboard 👩🏾‍🏫</h1>
+          <p id="welcome-sub">Manage your sessions, requests and profile.</p>
+        </div>
+        <button class="btn btn-outline-dark" style="font-size:0.83rem;" onclick="showToast('Availability coming soon!')">📅 Set Availability</button>
+      </div>
+
+      <div class="approval-banner">
+        <div class="ab-icon">⏳</div>
+        <div>
+          <h4>Profile under review</h4>
+          <p>Documents are being verified. You'll receive an email once approved (24–48 hrs).</p>
+        </div>
+      </div>
+
+      <div class="stat-cards">
+        <div class="stat-card"><div class="s-icon">📚</div><div class="s-val">0</div><div class="s-lbl">Sessions This Month</div><div class="s-note">Unlocks after approval</div></div>
+        <div class="stat-card"><div class="s-icon">💰</div><div class="s-val">P0</div><div class="s-lbl">Earnings This Month</div><div class="s-note">Unlocks after approval</div></div>
+        <div class="stat-card"><div class="s-icon">📩</div><div class="s-val">2</div><div class="s-lbl">Pending Requests</div><div class="s-note">Awaiting your response</div></div>
+        <div class="stat-card"><div class="s-icon">⭐</div><div class="s-val">—</div><div class="s-lbl">Your Rating</div><div class="s-note">After first session</div></div>
+      </div>
+
+      <div class="dash-grid">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Incoming requests preview -->
+          <div class="panel">
+            <div class="panel-title">
+              Incoming Requests
+              <button onclick="showTab('requests',document.getElementById('nav-requests'))">View all →</button>
+            </div>
+            <div class="req-item">
+              <div class="req-av">🎒</div>
+              <div class="req-info"><h4>Lesego Molefe — Mathematics (BGCSE)</h4><p>📅 Thursday 5:00 PM · 🌐 Online · 1 hour</p></div>
+              <div class="req-actions">
+                <button class="btn-confirm" onclick="confirmReq(this)">✓ Confirm</button>
+                <button class="btn-decline" onclick="declineReq(this)">✕</button>
+              </div>
+            </div>
+            <div class="req-item">
+              <div class="req-av">🎒</div>
+              <div class="req-info"><h4>Thabo Kgosi — Mathematics (BGCSE)</h4><p>📅 Friday 10:00 AM · 📍 In-Person · 1.5 hours</p></div>
+              <div class="req-actions">
+                <button class="btn-confirm" onclick="confirmReq(this)">✓ Confirm</button>
+                <button class="btn-decline" onclick="declineReq(this)">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Earnings chart -->
+          <div class="panel">
+            <div class="panel-title">Earnings Overview <span style="font-size:0.78rem;color:var(--muted);font-weight:400;">Last 6 months</span></div>
+            <div class="earn-chart" id="earn-chart"></div>
+            <p style="font-size:0.8rem;color:var(--muted);">Accept sessions to start building your earnings history.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="panel">
+            <div class="panel-title">Your Profile <span class="status-tag">Pending</span></div>
+            <div class="profile-row"><div class="pr-icon">🎓</div><div><h4 id="p-qualification">—</h4><p id="p-institution">Institution</p></div></div>
+            <div class="profile-row"><div class="pr-icon">📍</div><div><h4 id="p-city">—</h4><p>Location</p></div></div>
+            <div class="profile-row"><div class="pr-icon">💰</div><div><h4 id="p-rate">—</h4><p>Hourly rate</p></div></div>
+            <div class="divider"></div>
+            <button class="btn btn-outline-dark btn-full" style="font-size:0.8rem;" onclick="showToast('Profile editing coming soon!')">Edit Profile →</button>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Progress 💡</div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <div style="display:flex;gap:9px;font-size:0.82rem;color:var(--text);align-items:center;"><span>✅</span><span>Account created</span></div>
+              <div style="display:flex;gap:9px;font-size:0.82rem;color:var(--text);align-items:center;"><span>⏳</span><span>Documents under review</span></div>
+              <div style="display:flex;gap:9px;font-size:0.82rem;color:var(--muted);align-items:center;"><span>⬜</span><span>Get first 5-star review</span></div>
+              <div style="display:flex;gap:9px;font-size:0.82rem;color:var(--muted);align-items:center;"><span>⬜</span><span>Complete 10 sessions</span></div>
+              <div style="display:flex;gap:9px;font-size:0.82rem;color:var(--muted);align-items:center;"><span>⬜</span><span>Earn Top Tutor badge</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT REQUESTS TAB -->
+    <div class="tab-panel" id="tab-requests">
+      <div class="requests-header">
+        <h1>Student Requests 📩</h1>
+        <p>Review and respond to incoming session requests from students.</p>
+      </div>
+
+      <div class="request-tabs">
+        <button class="req-tab active" onclick="filterRequests('new',this)">New (2)</button>
+        <button class="req-tab" onclick="filterRequests('confirmed',this)">Confirmed</button>
+        <button class="req-tab" onclick="filterRequests('all',this)">All</button>
+      </div>
+
+      <div class="requests-list" id="requests-list">
+        <div class="request-card new-req" data-status="new">
+          <div class="rc-av">🎒</div>
+          <div class="rc-info">
+            <h4>Lesego Molefe</h4>
+            <p>📚 Mathematics (BGCSE) · 📅 Thursday, 5:00 PM · ⏱ 1 hour · 🌐 Online</p>
+            <p style="margin-top:4px;font-style:italic;">"I need help with quadratic equations before my test on Friday."</p>
+            <div class="rc-tags"><span class="rc-tag">BGCSE</span><span class="rc-tag">Mathematics</span><span class="rc-tag">Online</span></div>
+          </div>
+          <div class="rc-actions">
+            <button class="btn-confirm" onclick="confirmReq(this)">✓ Confirm</button>
+            <button class="btn-decline" onclick="declineReq(this)">✕ Decline</button>
+          </div>
+        </div>
+
+        <div class="request-card new-req" data-status="new">
+          <div class="rc-av">🎒</div>
+          <div class="rc-info">
+            <h4>Thabo Kgosi</h4>
+            <p>📚 Mathematics (BGCSE) · 📅 Friday, 10:00 AM · ⏱ 1.5 hours · 📍 In-Person, Gaborone</p>
+            <p style="margin-top:4px;font-style:italic;">"Struggling with calculus derivatives and integrals."</p>
+            <div class="rc-tags"><span class="rc-tag">BGCSE</span><span class="rc-tag">Mathematics</span><span class="rc-tag">In-Person</span></div>
+          </div>
+          <div class="rc-actions">
+            <button class="btn-confirm" onclick="confirmReq(this)">✓ Confirm</button>
+            <button class="btn-decline" onclick="declineReq(this)">✕ Decline</button>
+          </div>
+        </div>
+
+        <div class="request-card" data-status="confirmed" style="display:none;">
+          <div class="rc-av">🎒</div>
+          <div class="rc-info">
+            <h4>Naledi Sithole</h4>
+            <p>📚 Mathematics (JCE) · 📅 Last Tuesday · ⏱ 1 hour · 🌐 Online</p>
+            <div class="rc-tags"><span class="rc-tag">JCE</span><span class="rc-tag">Completed</span></div>
+          </div>
+          <div class="rc-actions">
+            <span style="font-size:0.78rem;color:#166534;font-weight:700;background:#dcfce7;padding:5px 11px;border-radius:7px;">✓ Done</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY SESSIONS TAB -->
+    <div class="tab-panel" id="tab-sessions">
+      <div class="dash-header">
+        <div>
+          <h1>My Sessions</h1>
+          <p>All your upcoming and completed tutoring sessions.</p>
+        </div>
+      </div>
+      <div class="sessions-list">
+        <div class="session-card"><div class="sc-av">🎒</div><div class="sc-info"><h4>Lesego Molefe — Mathematics (BGCSE)</h4><p>📅 Thursday · 5:00 PM · 1 hour · 🌐 Online</p></div><span class="sc-status status-upcoming">Upcoming</span></div>
+        <div class="session-card"><div class="sc-av">🎒</div><div class="sc-info"><h4>Thabo Kgosi — Mathematics (BGCSE)</h4><p>📅 Friday · 10:00 AM · 1.5 hours · 📍 In-Person</p></div><span class="sc-status status-pending">Pending</span></div>
+        <div class="session-card"><div class="sc-av">🎒</div><div class="sc-info"><h4>Naledi Sithole — Mathematics (JCE)</h4><p>📅 Last Tuesday · 1 hour · 🌐 Online</p></div><span class="sc-status status-completed">Completed</span></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/utils.js"></script>
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function filterRequests(status, btn) {
+  document.querySelectorAll('.req-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.request-card').forEach(card => {
+    if (status === 'all') card.style.display = 'flex';
+    else card.style.display = card.dataset.status === status ? 'flex' : 'none';
+  });
+}
+
+function confirmReq(btn) {
+  const card = btn.closest('.request-card, .req-item');
+  const name = card.querySelector('h4').textContent;
+  card.querySelector('.rc-actions, .req-actions').innerHTML =
+    '<span style="font-size:0.78rem;color:#166634;font-weight:700;background:#dcfce7;padding:5px 11px;border-radius:7px;">✓ Confirmed</span>';
+  if (card.dataset) card.dataset.status = 'confirmed';
+  card.classList.remove('new-req');
+  showToast('✅ Session confirmed! Student will be notified.');
+}
+
+function declineReq(btn) {
+  const card = btn.closest('.request-card, .req-item');
+  card.style.opacity = '0.45';
+  card.querySelector('.rc-actions, .req-actions').innerHTML =
+    '<span style="font-size:0.78rem;color:#991b1b;font-weight:700;background:#fee2e2;padding:5px 11px;border-radius:7px;">✕ Declined</span>';
+  showToast('Request declined.', 'error');
+}
+
+// Earnings chart
+const months = ['Aug','Sep','Oct','Nov','Dec','Jan'];
+const vals   = [0,0,0,0,0,0];
+document.getElementById('earn-chart').innerHTML = months.map((m,i) => `
+  <div class="bar-wrap">
+    <div class="bar ${vals[i]>0?'filled':''}" style="height:${Math.max((vals[i]/Math.max(...vals,1))*72,8)}px"></div>
+    <div class="bar-lbl">${m}</div>
+  </div>`).join('');
+
+const user = getSession();
+if (user) {
+  document.getElementById('sb-name').textContent = user.firstName || 'Tutor';
+  document.getElementById('nav-username').textContent = '👋 ' + (user.firstName || 'Tutor');
+  document.getElementById('welcome-sub').textContent = `Welcome, ${user.firstName||'Tutor'}. Your profile is being reviewed.`;
+  if (user.qualification) document.getElementById('p-qualification').textContent = user.qualification;
+  if (user.institution)   document.getElementById('p-institution').textContent = user.institution;
+  if (user.city)          document.getElementById('p-city').textContent = user.city;
+  if (user.rate)          document.getElementById('p-rate').textContent = 'P' + user.rate + '/hr';
+}
+</script>
+</body>
+</html>

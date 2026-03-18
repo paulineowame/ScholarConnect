@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Registration — ScholarConnect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: var(--card); }
+    .reg-layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+    }
+    .reg-sidebar {
+      background: #0a1f0a;
+      background: linear-gradient(160deg, #0a1a0f 0%, #0d2b14 100%);
+      padding: 100px 36px 60px;
+      position: sticky; top: 0; height: 100vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .reg-sidebar::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 20% 70%, rgba(34,197,94,0.2) 0%, transparent 65%);
+    }
+    .reg-sidebar .logo { position: relative; z-index: 2; font-size: 1.5rem; margin-bottom: 48px; }
+    .sidebar-title { position: relative; z-index: 2; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--white); line-height: 1.25; margin-bottom: 12px; }
+    .sidebar-badge { position: relative; z-index: 2; background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; padding: 5px 12px; border-radius: 100px; display: inline-block; margin-bottom: 36px; }
+
+    .sidebar-steps { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 0; }
+    .s-step { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; position: relative; }
+    .s-step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 44px; bottom: 0; width: 2px; background: rgba(255,255,255,0.1); }
+    .s-step.done::after { background: rgba(34,197,94,0.4); }
+    .s-step.active::after { background: rgba(245,158,11,0.3); }
+    .s-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; transition: all 0.3s; }
+    .s-step .s-dot     { background: rgba(255,255,255,0.08); color: var(--grey); border: 2px solid rgba(255,255,255,0.1); }
+    .s-step.done .s-dot  { background: var(--green); color: var(--white); border-color: var(--green); }
+    .s-step.active .s-dot { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+    .s-text { padding-top: 4px; }
+    .s-label { font-size: 0.82rem; font-weight: 600; color: var(--grey); transition: color 0.3s; }
+    .s-desc  { font-size: 0.75rem; color: rgba(148,163,184,0.5); margin-top: 2px; }
+    .s-step.active .s-label { color: var(--white); }
+    .s-step.done   .s-label { color: var(--green); }
+
+    .reg-main { padding: 100px 60px 60px; max-width: 680px; }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: fadeUp 0.4s ease; }
+
+    .panel-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--navy); margin-bottom: 6px; }
+    .panel-sub   { color: var(--muted); font-size: 0.9rem; margin-bottom: 32px; }
+    .nav-btns    { display: flex; gap: 14px; margin-top: 32px; }
+
+    .upload-area {
+      border: 2px dashed var(--border); border-radius: 12px;
+      padding: 28px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: var(--card);
+    }
+    .upload-area:hover { border-color: var(--accent); background: var(--light); }
+    .upload-area .u-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .upload-area p { color: var(--muted); font-size: 0.85rem; }
+    .upload-area strong { color: var(--accent); }
+
+    .pending-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fef9c3; color: #854d0e;
+      border: 1px solid #fde68a;
+      padding: 10px 18px; border-radius: 100px;
+      font-size: 0.85rem; font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .success-screen { text-align: center; padding: 60px 0; }
+    .success-icon { font-size: 4rem; margin-bottom: 20px; animation: bounce 0.6s ease; }
+    @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    .success-screen h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--navy); margin-bottom: 12px; }
+    .success-screen p  { color: var(--muted); font-size: 0.95rem; line-height: 1.7; max-width: 420px; margin: 0 auto 28px; }
+    .success-steps { display: flex; flex-direction: column; gap: 12px; max-width: 380px; margin: 0 auto 36px; text-align: left; }
+    .success-step { display: flex; gap: 12px; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 0.87rem; color: var(--text); }
+    .success-step span { font-size: 1.1rem; flex-shrink: 0; }
+    .success-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 900px) {
+      .reg-layout  { grid-template-columns: 1fr; }
+      .reg-sidebar { display: none; }
+      .reg-main    { padding: 100px 24px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Scholar<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/register">← Back</a></li>
+    <li><a href="/login">Sign In</a></li>
+  </ul>
+</nav>
+
+<div class="reg-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="reg-sidebar">
+    <a href="/" class="logo">Scholar<span>Connect</span></a>
+    <p class="sidebar-title">Tutor<br>Registration</p>
+    <div class="sidebar-badge">⭐ Earn up to P3,000/month</div>
+    <div class="sidebar-steps">
+      <div class="s-step active" data-step="0">
+        <div class="s-dot">1</div>
+        <div class="s-text"><div class="s-label">Personal Details</div><div class="s-desc">Name, email, password</div></div>
+      </div>
+      <div class="s-step" data-step="1">
+        <div class="s-dot">2</div>
+        <div class="s-text"><div class="s-label">Qualifications</div><div class="s-desc">Degree, institution, bio</div></div>
+      </div>
+      <div class="s-step" data-step="2">
+        <div class="s-dot">3</div>
+        <div class="s-text"><div class="s-label">Subjects & Rates</div><div class="s-desc">What you teach & your rate</div></div>
+      </div>
+      <div class="s-step" data-step="3">
+        <div class="s-dot">4</div>
+        <div class="s-text"><div class="s-label">Verification</div><div class="s-desc">ID & certificates</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="reg-main">
+
+    <!-- STEP 1: Personal Details -->
+    <div class="step-panel active" id="panel-0">
+      <div class="panel-title">Personal Details</div>
+      <p class="panel-sub">Start with your basic information — this will be shown on your public profile.</p>
+
+      <div id="alert-t0" class="alert"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="t-firstName" placeholder="e.g. Mpho">
+          <span class="field-error">First name is required.</span>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="t-lastName" placeholder="e.g. Setlhare">
+          <span class="field-error">Last name is required.</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" id="t-email" placeholder="yourname@email.com">
+        <span class="field-error">Please enter a valid email.</span>
+      </div>
+      <div class="form-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="t-phone" placeholder="+267 7X XXX XXX">
+        <span class="field-error">Phone number is required.</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Password *</label>
+          <div class="pw-wrap">
+            <input type="password" id="t-password" placeholder="Min 6 characters">
+            <button class="toggle-password" data-target="t-password">👁</button>
+          </div>
+          <span class="field-error">Password must be at least 6 characters.</span>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password *</label>
+          <div class="pw-wrap">
+            <input type="password" id="t-confirm" placeholder="Repeat password">
+            <button class="toggle-password" data-target="t-confirm">👁</button>
+          </div>
+          <span class="field-error">Passwords do not match.</span>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="nextStep(0)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Qualifications -->
+    <div class="step-panel" id="panel-1">
+      <div class="panel-title">Your Qualifications</div>
+      <p class="panel-sub">Tell students about your background — this builds trust and attracts bookings.</p>
+
+      <div id="alert-t1" class="alert"></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Highest Qualification *</label>
+          <select id="t-qualification">
+            <option value="">Select qualification</option>
+            <option>BGCSE</option>
+            <option>Diploma</option>
+            <option>Bachelor's Degree</option>
+            <option>Master's Degree</option>
+            <option>PhD</option>
+            <option>Teaching Certificate / PGCE</option>
+          </select>
+          <span class="field-error">Please select your qualification.</span>
+        </div>
+        <div class="form-group">
+          <label>Institution *</label>
+          <input type="text" id="t-institution" placeholder="e.g. University of Botswana">
+          <span class="field-error">Institution is required.</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City / Town *</label>
+          <select id="t-city">
+            <option value="">Select your city</option>
+            <option>Gaborone</option>
+            <option>Francistown</option>
+            <option>Maun</option>
+            <option>Serowe</option>
+            <option>Lobatse</option>
+            <option>Kanye</option>
+            <option>Molepolole</option>
+            <option>Palapye</option>
+            <option>Other</option>
+          </select>
+          <span class="field-error">Please select your city.</span>
+        </div>
+        <div class="form-group">
+          <label>Years of Teaching Experience</label>
+          <select id="t-experience">
+            <option>Less than 1 year</option>
+            <option>1–2 years</option>
+            <option>3–5 years</option>
+            <option>5+ years</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Profile Bio *</label>
+        <textarea id="t-bio" placeholder="Tell students about your academic background, teaching style and approach. Be specific — tutors with detailed bios get 3× more bookings."></textarea>
+        <p class="form-hint">Minimum 50 characters. Be specific about subjects and experience.</p>
+        <span class="field-error">Please write a short bio (min 50 characters).</span>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-outline-dark" onclick="prevStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(1)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Subjects & Rates -->
+    <div class="step-panel" id="panel-2">
+      <div class="panel-title">Subjects & Rates</div>
+      <p class="panel-sub">Select the subjects you can teach and set your hourly rate.</p>
+
+      <div id="alert-t2" class="alert"></div>
+
+      <div class="form-group">
+        <label>Subjects You Teach *</label>
+        <div class="checkbox-grid" id="t-subject-boxes">
+          <label class="checkbox-item"><input type="checkbox" value="Mathematics"> Mathematics</label>
+          <label class="checkbox-item"><input type="checkbox" value="Physics"> Physics</label>
+          <label class="checkbox-item"><input type="checkbox" value="Chemistry"> Chemistry</label>
+          <label class="checkbox-item"><input type="checkbox" value="Biology"> Biology</label>
+          <label class="checkbox-item"><input type="checkbox" value="English"> English</label>
+          <label class="checkbox-item"><input type="checkbox" value="Setswana"> Setswana</label>
+          <label class="checkbox-item"><input type="checkbox" value="History"> History</label>
+          <label class="checkbox-item"><input type="checkbox" value="Geography"> Geography</label>
+          <label class="checkbox-item"><input type="checkbox" value="Accounting"> Accounting</label>
+          <label class="checkbox-item"><input type="checkbox" value="Computer Science"> Comp. Science</label>
+          <label class="checkbox-item"><input type="checkbox" value="Business Studies"> Business Stud.</label>
+          <label class="checkbox-item"><input type="checkbox" value="Agriculture"> Agriculture</label>
+        </div>
+        <span class="field-error" id="t-subject-error" style="display:none;margin-top:8px;">Please select at least one subject.</span>
+      </div>
+
+      <div class="form-group">
+        <label>Levels You Teach *</label>
+        <div class="checkbox-grid" id="t-level-boxes">
+          <label class="checkbox-item"><input type="checkbox" value="Primary"> Primary (Std 1–7)</label>
+          <label class="checkbox-item"><input type="checkbox" value="JCE"> JCE (Form 1–3)</label>
+          <label class="checkbox-item"><input type="checkbox" value="BGCSE"> BGCSE (Form 4–5)</label>
+          <label class="checkbox-item"><input type="checkbox" value="University"> University Level</label>
+        </div>
+        <span class="field-error" id="t-level-error" style="display:none;margin-top:8px;">Please select at least one level.</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hourly Rate (Pula) *</label>
+          <input type="number" id="t-rate" placeholder="e.g. 100" min="50" max="500">
+          <p class="form-hint">Average on platform: P85/hr. Suggested range: P60–P150.</p>
+          <span class="field-error">Please enter your hourly rate.</span>
+        </div>
+        <div class="form-group">
+          <label>Session Preference *</label>
+          <select id="t-session">
+            <option value="">Select preference</option>
+            <option>Online Only</option>
+            <option>In-Person Only</option>
+            <option>Both Online & In-Person</option>
+          </select>
+          <span class="field-error">Please select a session preference.</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Availability *</label>
+        <select id="t-availability">
+          <option>Weekdays (Mon–Fri)</option>
+          <option>Weekends only</option>
+          <option>Weekdays & Weekends</option>
+          <option>Evenings only (after 5pm)</option>
+        </select>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-outline-dark" onclick="prevStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Verification Docs -->
+    <div class="step-panel" id="panel-3">
+      <div class="panel-title">Identity Verification</div>
+      <p class="panel-sub">Upload your documents so we can verify your profile. All documents are reviewed securely within 24–48 hours.</p>
+
+      <div id="alert-t3" class="alert"></div>
+
+      <div class="pending-badge">⏳ Documents are reviewed within 24–48 hours</div>
+
+      <div class="form-group">
+        <label>National ID or Passport *</label>
+        <div class="upload-area" onclick="triggerUpload('id-upload')">
+          <div class="u-icon" id="id-icon">🪪</div>
+          <p><strong>Click to upload</strong> your National ID or Passport</p>
+          <p style="font-size:0.77rem;margin-top:4px;">JPG, PNG or PDF · Max 5MB</p>
+          <p id="id-filename" style="margin-top:8px;color:var(--accent);font-size:0.82rem;font-weight:600;"></p>
+        </div>
+        <input type="file" id="id-upload" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="fileSelected(this,'id-icon','id-filename')">
+      </div>
+
+      <div class="form-group">
+        <label>Academic Certificate or Transcript *</label>
+        <div class="upload-area" onclick="triggerUpload('cert-upload')">
+          <div class="u-icon" id="cert-icon">🎓</div>
+          <p><strong>Click to upload</strong> your highest qualification certificate</p>
+          <p style="font-size:0.77rem;margin-top:4px;">JPG, PNG or PDF · Max 5MB</p>
+          <p id="cert-filename" style="margin-top:8px;color:var(--accent);font-size:0.82rem;font-weight:600;"></p>
+        </div>
+        <input type="file" id="cert-upload" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="fileSelected(this,'cert-icon','cert-filename')">
+      </div>
+
+      <div class="form-group">
+        <label>Optional: Any other supporting document</label>
+        <div class="upload-area" onclick="triggerUpload('extra-upload')">
+          <div class="u-icon">📎</div>
+          <p><strong>Click to upload</strong> (e.g. reference letter, teaching certificate)</p>
+          <p style="font-size:0.77rem;margin-top:4px;">JPG, PNG or PDF · Max 5MB · Optional</p>
+          <p id="extra-filename" style="margin-top:8px;color:var(--accent);font-size:0.82rem;font-weight:600;"></p>
+        </div>
+        <input type="file" id="extra-upload" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="fileSelected(this,null,'extra-filename')">
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-outline-dark" onclick="prevStep(3)">← Back</button>
+        <button class="btn btn-primary btn-lg" onclick="submitTutor()" id="submit-btn">Submit Application →</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step-panel" id="panel-success">
+      <div class="success-screen">
+        <div class="success-icon">🎊</div>
+        <h2>Application Submitted!</h2>
+        <p>Your tutor application is under review. Here's what happens next:</p>
+        <div class="success-steps">
+          <div class="success-step"><span>📋</span> Our team reviews your documents (24–48 hrs)</div>
+          <div class="success-step"><span>📧</span> You'll receive an email once your profile is approved</div>
+          <div class="success-step"><span>🟢</span> Your profile goes live and students can book you</div>
+        </div>
+        <div class="success-actions">
+          <a href="/dashboard/tutor" class="btn btn-primary btn-lg">Go to Dashboard</a>
+          <a href="/" class="btn btn-outline-dark">Back to Home</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/utils.js"></script>
+<script>
+  let currentStep = 0;
+
+  function updateSidebar(step) {
+    document.querySelectorAll('.s-step').forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i < step) s.classList.add('done');
+      else if (i === step) s.classList.add('active');
+    });
+  }
+
+  function showPanel(idx) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    const id = idx === 'success' ? 'panel-success' : 'panel-' + idx;
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextStep(from) {
+    if (from === 0) {
+      const ok1 = validateField('t-firstName', 'First name is required.');
+      const ok2 = validateField('t-lastName', 'Last name is required.');
+      const ok3 = validateEmail('t-email');
+      const ok4 = validateField('t-phone', 'Phone number is required.');
+      const ok5 = validatePassword('t-password', 6);
+      const pw = document.getElementById('t-password').value;
+      const cf = document.getElementById('t-confirm').value;
+      const cfGroup = document.getElementById('t-confirm').closest('.form-group');
+      if (pw !== cf) { cfGroup.classList.add('error'); cfGroup.querySelector('.field-error').textContent = 'Passwords do not match.'; }
+      else cfGroup.classList.remove('error');
+      if (!ok1 || !ok2 || !ok3 || !ok4 || !ok5 || pw !== cf) return;
+    }
+    if (from === 1) {
+      const ok1 = validateField('t-qualification', 'Please select your qualification.');
+      const ok2 = validateField('t-institution', 'Institution is required.');
+      const ok3 = validateField('t-city', 'Please select your city.');
+      const bio = document.getElementById('t-bio').value.trim();
+      const bioGroup = document.getElementById('t-bio').closest('.form-group');
+      if (bio.length < 50) { bioGroup.classList.add('error'); } else { bioGroup.classList.remove('error'); }
+      if (!ok1 || !ok2 || !ok3 || bio.length < 50) return;
+    }
+    if (from === 2) {
+      const subjects = document.querySelectorAll('#t-subject-boxes input:checked').length;
+      const levels   = document.querySelectorAll('#t-level-boxes input:checked').length;
+      const sErr = document.getElementById('t-subject-error');
+      const lErr = document.getElementById('t-level-error');
+      if (!subjects) { sErr.style.display = 'block'; return; } else sErr.style.display = 'none';
+      if (!levels)   { lErr.style.display = 'block'; return; } else lErr.style.display = 'none';
+      const ok1 = validateField('t-rate', 'Please enter your hourly rate.');
+      const ok2 = validateField('t-session', 'Please select a session preference.');
+      if (!ok1 || !ok2) return;
+    }
+    currentStep = from + 1;
+    updateSidebar(currentStep);
+    showPanel(currentStep);
+  }
+
+  function prevStep(from) {
+    currentStep = from - 1;
+    updateSidebar(currentStep);
+    showPanel(currentStep);
+  }
+
+  function triggerUpload(id) { document.getElementById(id).click(); }
+
+  function fileSelected(input, iconId, nameId) {
+    if (input.files && input.files[0]) {
+      document.getElementById(nameId).textContent = '✓ ' + input.files[0].name;
+      if (iconId) document.getElementById(iconId).textContent = '✅';
+    }
+  }
+
+  async function submitTutor() {
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = 'Submitting...'; btn.disabled = true;
+
+    const subjects = [...document.querySelectorAll('#t-subject-boxes input:checked')].map(c => c.value);
+    const levels   = [...document.querySelectorAll('#t-level-boxes input:checked')].map(c => c.value);
+
+    try {
+      const res = await postJSON('/api/register/tutor', {
+        firstName:    document.getElementById('t-firstName').value.trim(),
+        lastName:     document.getElementById('t-lastName').value.trim(),
+        email:        document.getElementById('t-email').value.trim(),
+        password:     document.getElementById('t-password').value,
+        phone:        document.getElementById('t-phone').value.trim(),
+        qualification: document.getElementById('t-qualification').value,
+        institution:  document.getElementById('t-institution').value.trim(),
+        city:         document.getElementById('t-city').value,
+        experience:   document.getElementById('t-experience').value,
+        bio:          document.getElementById('t-bio').value.trim(),
+        subjects,
+        levels,
+        rate:         document.getElementById('t-rate').value,
+        session:      document.getElementById('t-session').value,
+        availability: document.getElementById('t-availability').value,
+      });
+
+      if (res.success) {
+        saveSession(res.user);
+        updateSidebar(99);
+        showPanel('success');
+      } else {
+        showAlert('alert-t3', res.message);
+        btn.textContent = 'Submit Application →'; btn.disabled = false;
+      }
+    } catch (e) {
+      showAlert('alert-t3', 'Something went wrong. Please try again.');
+      btn.textContent = 'Submit Application →'; btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

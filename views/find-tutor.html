@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find a Tutor — ScholarConnect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .find-hero { background: var(--navy); padding: 110px 5% 60px; position: relative; overflow: hidden; }
+    .find-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(37,87,167,0.4) 0%, transparent 70%); pointer-events:none; }
+    .find-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); color:var(--white); margin-bottom:10px; position:relative; }
+    .find-hero p { color:var(--grey); font-size:1rem; position:relative; margin-bottom:28px; }
+
+    .search-bar { display:flex; gap:0; background:var(--white); border-radius:14px; overflow:hidden; max-width:680px; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+    .search-bar input { flex:1; border:none; outline:none; font-family:'DM Sans',sans-serif; font-size:0.92rem; color:var(--text); padding:15px 20px; }
+    .search-bar select { border:none; border-left:1px solid var(--border); outline:none; font-family:'DM Sans',sans-serif; font-size:0.88rem; color:var(--muted); padding:15px 14px; background:var(--white); }
+    .search-bar button { background:var(--accent); color:var(--white); border:none; padding:15px 28px; font-weight:700; font-size:0.9rem; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .search-bar button:hover { background:var(--mid); }
+
+    .find-body { display:grid; grid-template-columns:260px 1fr; gap:32px; padding:44px 5%; max-width:1280px; margin:0 auto; }
+
+    .filters { background:var(--white); border:1px solid var(--border); border-radius:18px; padding:26px; height:fit-content; position:sticky; top:88px; }
+    .filters h3 { font-size:0.95rem; font-weight:700; color:var(--navy); margin-bottom:22px; }
+    .filter-group { margin-bottom:22px; }
+    .filter-group label { font-size:0.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:10px; }
+    .chips { display:flex; flex-wrap:wrap; gap:7px; }
+    .chip { background:var(--light); color:var(--blue); border:1.5px solid var(--border); border-radius:100px; padding:5px 13px; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .chip:hover,.chip.active { background:var(--accent); color:var(--white); border-color:var(--accent); }
+    .price-val { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--muted); margin-bottom:6px; }
+    input[type=range] { width:100%; accent-color:var(--accent); }
+
+    .results-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+    .results-bar h3 { font-size:0.95rem; color:var(--navy); font-weight:600; }
+    .results-bar select { border:1px solid var(--border); border-radius:8px; padding:7px 12px; font-family:'DM Sans',sans-serif; font-size:0.83rem; color:var(--muted); outline:none; }
+
+    .tutors-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+
+    .tutor-card { background:var(--white); border:1.5px solid var(--border); border-radius:18px; padding:22px; cursor:pointer; transition:all 0.3s; }
+    .tutor-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(37,87,167,0.12); border-color:var(--accent); }
+    .tc-top { display:flex; gap:14px; align-items:flex-start; margin-bottom:14px; }
+    .tc-av { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; }
+    .tc-info h4 { font-size:0.95rem; font-weight:700; color:var(--navy); }
+    .tc-subject { color:var(--accent); font-size:0.8rem; font-weight:600; margin-top:2px; }
+    .tc-loc { color:var(--muted); font-size:0.78rem; margin-top:3px; }
+    .tc-badge { margin-left:auto; background:#dcfce7; color:#16a34a; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:100px; white-space:nowrap; }
+    .tc-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; }
+    .tc-tag { background:var(--light); color:var(--blue); font-size:0.73rem; padding:3px 9px; border-radius:6px; }
+    .tc-foot { display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px; }
+    .tc-rate { font-size:1.05rem; font-weight:700; color:var(--navy); }
+    .tc-rate span { font-size:0.75rem; color:var(--muted); font-weight:400; }
+    .tc-rating { display:flex; align-items:center; gap:4px; color:var(--gold); font-size:0.82rem; font-weight:600; }
+    .tc-rating small { color:var(--muted); font-size:0.72rem; }
+    .book-btn { background:var(--accent); color:var(--white); border:none; border-radius:8px; padding:8px 16px; font-weight:600; font-size:0.82rem; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+    .book-btn:hover { background:var(--mid); }
+
+    .no-results { grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--muted); }
+    .no-results .nr-icon { font-size:3rem; margin-bottom:14px; }
+
+    /* Modal */
+    .overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(10,22,40,0.8); backdrop-filter:blur(4px); align-items:center; justify-content:center; }
+    .overlay.open { display:flex; }
+    .modal { background:var(--white); border-radius:22px; padding:36px; max-width:500px; width:92%; position:relative; animation:fadeUp 0.3s ease; max-height:90vh; overflow-y:auto; }
+    .modal-close { position:absolute; top:16px; right:16px; background:var(--light); border:none; border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; color:var(--muted); transition:all 0.2s; }
+    .modal-close:hover { background:var(--border); }
+    .m-head { display:flex; gap:16px; align-items:center; margin-bottom:20px; }
+    .m-av { width:68px; height:68px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; flex-shrink:0; }
+    .m-head h3 { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--navy); }
+    .m-head .tc-subject { font-size:0.88rem; }
+    .m-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
+    .m-item { background:var(--card); border-radius:10px; padding:13px; }
+    .m-label { font-size:0.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .m-val { font-size:0.92rem; color:var(--navy); font-weight:600; }
+    .m-bio { color:var(--muted); font-size:0.87rem; line-height:1.65; margin-bottom:20px; }
+    .modal-book { width:100%; background:var(--accent); color:var(--white); border:none; border-radius:12px; padding:14px; font-size:0.93rem; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.2s; }
+    .modal-book:hover { background:var(--mid); }
+
+    @media(max-width:900px){
+      .find-body{grid-template-columns:1fr;}
+      .filters{position:static;}
+      .tutors-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Scholar<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/find-tutor" class="active">Find a Tutor</a></li>
+    <li><a href="/login">Login</a></li>
+    <li><a href="/register" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+  <section class="find-hero">
+    <h1>Find Your Perfect Tutor</h1>
+    <p>Browse verified tutors across Botswana — filter by subject, location and price.</p>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search by subject or tutor name..." oninput="filterTutors()">
+      <select id="search-level" onchange="filterTutors()">
+        <option value="">All Levels</option>
+        <option>Primary</option>
+        <option>JCE</option>
+        <option>BGCSE</option>
+        <option>University</option>
+      </select>
+      <button onclick="filterTutors()">🔍 Search</button>
+    </div>
+  </section>
+
+  <div class="find-body">
+    <aside class="filters">
+      <h3>🎛 Filters</h3>
+      <div class="filter-group">
+        <label>Subject</label>
+        <div class="chips">
+          <span class="chip active" onclick="setFilter(this,'subject','All')">All</span>
+          <span class="chip" onclick="setFilter(this,'subject','Mathematics')">Maths</span>
+          <span class="chip" onclick="setFilter(this,'subject','Physics')">Physics</span>
+          <span class="chip" onclick="setFilter(this,'subject','Chemistry')">Chemistry</span>
+          <span class="chip" onclick="setFilter(this,'subject','English')">English</span>
+          <span class="chip" onclick="setFilter(this,'subject','Computer Science')">CS</span>
+          <span class="chip" onclick="setFilter(this,'subject','Accounting')">Accounting</span>
+          <span class="chip" onclick="setFilter(this,'subject','History')">History</span>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Session Type</label>
+        <div class="chips">
+          <span class="chip active" onclick="setFilter(this,'type','All')">All</span>
+          <span class="chip" onclick="setFilter(this,'type','Online')">🌐 Online</span>
+          <span class="chip" onclick="setFilter(this,'type','In-Person')">📍 In-Person</span>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Location</label>
+        <div class="chips">
+          <span class="chip active" onclick="setFilter(this,'loc','All')">All</span>
+          <span class="chip" onclick="setFilter(this,'loc','Gaborone')">Gaborone</span>
+          <span class="chip" onclick="setFilter(this,'loc','Francistown')">Francistown</span>
+          <span class="chip" onclick="setFilter(this,'loc','Maun')">Maun</span>
+          <span class="chip" onclick="setFilter(this,'loc','Serowe')">Serowe</span>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="price-val"><span>Max Price</span><strong id="price-lbl">P200/hr</strong></div>
+        <input type="range" min="50" max="300" value="200" id="price-range" oninput="document.getElementById('price-lbl').textContent='P'+this.value+'/hr'; filterTutors()">
+      </div>
+      <div class="filter-group">
+        <label>Min Rating</label>
+        <div class="chips">
+          <span class="chip active" onclick="setFilter(this,'rating',0)">Any</span>
+          <span class="chip" onclick="setFilter(this,'rating',4)">4★+</span>
+          <span class="chip" onclick="setFilter(this,'rating',4.5)">4.5★+</span>
+        </div>
+      </div>
+    </aside>
+
+    <div>
+      <div class="results-bar">
+        <h3 id="results-count">Loading tutors...</h3>
+        <select onchange="sortTutors(this.value)">
+          <option value="recommended">Recommended</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="rating">Rating: Highest</option>
+        </select>
+      </div>
+      <div class="tutors-grid" id="tutors-grid"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 ScholarConnect Botswana.</p>
+    <p>Made for Botswana 🇧🇼</p>
+  </footer>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="m-head">
+      <div class="m-av" id="m-av"></div>
+      <div>
+        <h3 id="m-name"></h3>
+        <div class="tc-subject" id="m-subject"></div>
+      </div>
+    </div>
+    <div class="m-grid">
+      <div class="m-item"><div class="m-label">Rate</div><div class="m-val" id="m-rate"></div></div>
+      <div class="m-item"><div class="m-label">Rating</div><div class="m-val" id="m-rating"></div></div>
+      <div class="m-item"><div class="m-label">Location</div><div class="m-val" id="m-loc"></div></div>
+      <div class="m-item"><div class="m-label">Sessions Done</div><div class="m-val" id="m-sessions"></div></div>
+    </div>
+    <p class="m-bio" id="m-bio"></p>
+    <button class="modal-book" onclick="requestSession()">📅 Request a Session</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/utils.js"></script>
+<script>
+const TUTORS = [
+  {id:1,name:'Mpho Setlhare',   emoji:'👩🏾‍🏫',bg:'#1e3a5f',subject:'Mathematics',    level:'BGCSE',      loc:'Gaborone',   rate:80,  rating:4.9,sessions:143,type:'Both',     bio:'BGCSE Mathematics specialist with 3 years tutoring experience. Practice-based methods tailored to the Botswana curriculum.'},
+  {id:2,name:'Tebogo Mokoena',  emoji:'👨🏾‍💻',bg:'#1a3a6b',subject:'Computer Science',level:'University', loc:'Gaborone',   rate:100, rating:4.8,sessions:87, type:'Online',   bio:'UB Computer Science graduate. I teach programming, databases and networking. Available evenings and weekends.'},
+  {id:3,name:'Kefilwe Dube',    emoji:'👩🏽‍🔬',bg:'#163050',subject:'Chemistry',       level:'BGCSE',      loc:'Francistown',rate:90,  rating:4.7,sessions:102,type:'Both',     bio:'Science teacher with BGCSE and A-Level experience. Passionate about making complex science concepts simple and fun.'},
+  {id:4,name:'Onkutlwile Tau',  emoji:'👨🏾‍🏫',bg:'#0f2744',subject:'English',         level:'JCE',        loc:'Gaborone',   rate:70,  rating:4.6,sessions:58, type:'In-Person',bio:'English graduate helping students with writing, comprehension and essay skills for JCE and BGCSE exams.'},
+  {id:5,name:'Boitumelo Nkwe',  emoji:'👩🏾‍💼',bg:'#1c3560',subject:'Accounting',      level:'BGCSE',      loc:'Maun',       rate:85,  rating:4.9,sessions:76, type:'Online',   bio:'CPA-qualified accountant helping BGCSE and university students master financial accounting and bookkeeping.'},
+  {id:6,name:'Kabelo Sithole',  emoji:'👨🏽‍🎓',bg:'#14305a',subject:'Physics',         level:'BGCSE',      loc:'Serowe',     rate:75,  rating:4.5,sessions:61, type:'Both',     bio:'Physics and Mathematics tutor specialising in BGCSE exam preparation. Strong track record with struggling students.'},
+  {id:7,name:'Dineo Gaolatlhe', emoji:'👩🏾‍🏫',bg:'#1a3050',subject:'History',         level:'JCE',        loc:'Gaborone',   rate:65,  rating:4.7,sessions:44, type:'In-Person',bio:'Humanities specialist with a passion for Botswana history and social studies. Engaging and context-rich lessons.'},
+  {id:8,name:'Refilwe Pheko',   emoji:'👨🏾‍💻',bg:'#102040',subject:'Mathematics',    level:'University', loc:'Gaborone',   rate:120, rating:5.0,sessions:199,type:'Online',   bio:'UB Mathematics lecturer offering private tutoring for university-level calculus, statistics and linear algebra.'},
+];
+
+let activeFilters = { subject:'All', type:'All', loc:'All', rating:0 };
+let currentList = [...TUTORS];
+
+function renderTutors(list) {
+  currentList = list;
+  const grid = document.getElementById('tutors-grid');
+  document.getElementById('results-count').textContent = `Showing ${list.length} tutor${list.length!==1?'s':''}`;
+  if (!list.length) {
+    grid.innerHTML = `<div class="no-results"><div class="nr-icon">🔍</div><p>No tutors match your filters.<br>Try adjusting your search.</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(t => `
+    <div class="tutor-card" onclick="openModal(${t.id})">
+      <div class="tc-top">
+        <div class="tc-av" style="background:${t.bg}">${t.emoji}</div>
+        <div class="tc-info">
+          <h4>${t.name}</h4>
+          <div class="tc-subject">${t.subject}</div>
+          <div class="tc-loc">📍 ${t.loc} · ${t.level}</div>
+        </div>
+        <span class="tc-badge">${t.type==='Online'?'🌐 Online':t.type==='In-Person'?'📍 In-Person':'🔄 Both'}</span>
+      </div>
+      <div class="tc-tags">
+        <span class="tc-tag">${t.level}</span>
+        <span class="tc-tag">${t.sessions} sessions</span>
+        <span class="tc-tag">${t.availability||'Flexible'}</span>
+      </div>
+      <div class="tc-foot">
+        <div class="tc-rate">P${t.rate}<span>/hr</span></div>
+        <div class="tc-rating">★ ${t.rating} <small>(${t.sessions})</small></div>
+        <button class="book-btn" onclick="event.stopPropagation();openModal(${t.id})">View & Book</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterTutors() {
+  const search   = document.getElementById('search-input').value.toLowerCase();
+  const level    = document.getElementById('search-level').value;
+  const maxPrice = parseInt(document.getElementById('price-range').value);
+  const minRating = parseFloat(activeFilters.rating);
+
+  let filtered = TUTORS.filter(t => {
+    if (search && !t.name.toLowerCase().includes(search) && !t.subject.toLowerCase().includes(search)) return false;
+    if (level && t.level !== level) return false;
+    if (t.rate > maxPrice) return false;
+    if (t.rating < minRating) return false;
+    if (activeFilters.subject !== 'All' && !t.subject.includes(activeFilters.subject)) return false;
+    if (activeFilters.type !== 'All' && t.type !== 'Both' && t.type !== activeFilters.type) return false;
+    if (activeFilters.loc !== 'All' && t.loc !== activeFilters.loc) return false;
+    return true;
+  });
+  renderTutors(filtered);
+}
+
+function sortTutors(val) {
+  let list = [...currentList];
+  if (val === 'price-asc')  list.sort((a,b) => a.rate - b.rate);
+  if (val === 'price-desc') list.sort((a,b) => b.rate - a.rate);
+  if (val === 'rating')     list.sort((a,b) => b.rating - a.rating);
+  renderTutors(list);
+}
+
+function setFilter(el, key, val) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilters[key] = val;
+  filterTutors();
+}
+
+function openModal(id) {
+  const t = TUTORS.find(x => x.id === id);
+  document.getElementById('m-av').style.background = t.bg;
+  document.getElementById('m-av').textContent = t.emoji;
+  document.getElementById('m-name').textContent = t.name;
+  document.getElementById('m-subject').textContent = t.subject + ' · ' + t.level;
+  document.getElementById('m-rate').textContent = 'P' + t.rate + '/hr';
+  document.getElementById('m-rating').textContent = '★ ' + t.rating;
+  document.getElementById('m-loc').textContent = t.loc;
+  document.getElementById('m-sessions').textContent = t.sessions + ' completed';
+  document.getElementById('m-bio').textContent = t.bio;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function requestSession() {
+  closeModal();
+  const user = getSession();
+  if (!user) {
+    showToast('Please log in or register to book a session.', 'error');
+    setTimeout(() => window.location.href = '/login', 1500);
+    return;
+  }
+  showToast('✅ Session request sent! The tutor will confirm shortly.');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+renderTutors(TUTORS);
+</script>
+</body>
+</html>

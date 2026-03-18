@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScholarConnect Botswana</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy);
+      min-height: 94vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      padding: 120px 5% 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 80% at 70% 50%, rgba(37,87,167,0.35) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 15% 80%, rgba(59,130,246,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .hero-text { position: relative; z-index: 2; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.3);
+      color: var(--sky);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      color: var(--white); line-height: 1.1;
+      margin-bottom: 22px;
+    }
+    .hero h1 em { color: var(--sky); font-style: normal; }
+    .hero-sub { color: #94a3b8; font-size: 1.08rem; line-height: 1.7; max-width: 480px; margin-bottom: 40px; }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    /* hero visual */
+    .hero-visual { position: relative; z-index: 2; }
+    .hero-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 20px; padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+    .preview-tutor {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px 16px;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+    .preview-tutor:hover { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+    .p-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+    .p-info h4 { color: var(--white); font-size: 0.9rem; font-weight: 600; }
+    .p-info p  { color: var(--grey); font-size: 0.78rem; margin-top: 2px; }
+    .p-meta { margin-left: auto; text-align: right; }
+    .p-stars { color: var(--gold); font-size: 0.72rem; }
+    .p-rate  { color: var(--sky); font-size: 0.85rem; font-weight: 600; }
+    .hero-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 16px; }
+    .stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 8px; text-align: center; }
+    .stat .n { color: var(--sky); font-size: 1.3rem; font-weight: 700; font-family: 'Playfair Display', serif; }
+    .stat .l { color: var(--grey); font-size: 0.7rem; margin-top: 3px; }
+
+    /* how it works */
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+    .step-card { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 32px 24px; transition: all 0.3s; }
+    .step-card:hover { transform: translateY(-5px); box-shadow: 0 18px 48px rgba(37,87,167,0.1); border-color: var(--accent); }
+    .step-num { width: 46px; height: 46px; background: var(--light); color: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 18px; }
+    .step-card h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .step-card p  { color: var(--muted); font-size: 0.87rem; line-height: 1.6; }
+
+    /* features */
+    .features { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; max-width: 860px; }
+    .feat { display: flex; gap: 16px; align-items: flex-start; background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 22px; transition: all 0.25s; }
+    .feat:hover { box-shadow: 0 8px 28px rgba(37,87,167,0.08); border-color: var(--accent); }
+    .feat-icon { width: 42px; height: 42px; background: var(--light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .feat h4 { font-size: 0.93rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+    .feat p  { color: var(--muted); font-size: 0.83rem; line-height: 1.5; }
+
+    /* testimonials */
+    .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+    .testi { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 26px; transition: all 0.3s; }
+    .testi:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(37,87,167,0.1); }
+    .t-stars { color: var(--gold); font-size: 0.88rem; margin-bottom: 12px; }
+    .t-text  { color: var(--text); font-size: 0.88rem; line-height: 1.65; font-style: italic; margin-bottom: 18px; }
+    .t-auth  { display: flex; align-items: center; gap: 10px; }
+    .t-av    { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--light); font-size: 1rem; }
+    .t-name  { font-weight: 600; font-size: 0.85rem; color: var(--navy); }
+    .t-role  { color: var(--muted); font-size: 0.76rem; }
+
+    /* cta */
+    .cta { background: var(--navy); padding: 80px 5%; text-align: center; position: relative; overflow: hidden; }
+    .cta::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(37,87,167,0.4) 0%, transparent 70%); pointer-events: none; }
+    .cta h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,4vw,3rem); color: var(--white); margin-bottom: 14px; position: relative; }
+    .cta p  { color: var(--grey); margin-bottom: 36px; position: relative; }
+    .cta .hero-btns { justify-content: center; position: relative; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .steps { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Scholar<span>Connect</span></a>
+  <ul class="nav-links">
+    <li><a href="/" class="active">Home</a></li>
+    <li><a href="/find-tutor">Find a Tutor</a></li>
+    <li><a href="/login">Login</a></li>
+    <li><a href="/register" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-text">
+      <div class="hero-badge">🎓 Botswana's Tutoring Platform</div>
+      <h1 class="fade-up">Connect with <em>Expert Tutors</em> — Instantly</h1>
+      <p class="hero-sub fade-up delay-1">ScholarConnect matches students with verified tutors across Botswana. Book sessions online or in-person, anytime.</p>
+      <div class="hero-btns fade-up delay-2">
+        <a href="/find-tutor" class="btn btn-primary btn-lg">Find a Tutor</a>
+        <a href="/register" class="btn btn-outline btn-lg">Get Started Free</a>
+      </div>
+    </div>
+    <div class="hero-visual fade-up delay-1">
+      <div class="hero-card">
+        <div class="preview-tutor">
+          <div class="p-avatar" style="background:#1e3a5f">👩🏾‍🏫</div>
+          <div class="p-info"><h4>Mpho Setlhare</h4><p>Mathematics · BGCSE</p></div>
+          <div class="p-meta"><div class="p-stars">★★★★★</div><div class="p-rate">P80/hr</div></div>
+        </div>
+        <div class="preview-tutor">
+          <div class="p-avatar" style="background:#1a3a6b">👨🏾‍💻</div>
+          <div class="p-info"><h4>Tebogo Mokoena</h4><p>Computer Science · UB</p></div>
+          <div class="p-meta"><div class="p-stars">★★★★★</div><div class="p-rate">P100/hr</div></div>
+        </div>
+        <div class="preview-tutor">
+          <div class="p-avatar" style="background:#163050">👩🏽‍🔬</div>
+          <div class="p-info"><h4>Kefilwe Dube</h4><p>Chemistry & Biology</p></div>
+          <div class="p-meta"><div class="p-stars">★★★★☆</div><div class="p-rate">P90/hr</div></div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><div class="n">200+</div><div class="l">Verified Tutors</div></div>
+          <div class="stat"><div class="n">1.2k</div><div class="l">Sessions Booked</div></div>
+          <div class="stat"><div class="n">4.8★</div><div class="l">Avg Rating</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section section-light">
+    <div class="section-label">How It Works</div>
+    <div class="section-title">Academic help in three simple steps</div>
+    <p class="section-sub">Getting connected with the right tutor is fast, easy and secure — just like booking a ride.</p>
+    <div class="steps">
+      <div class="step-card fade-up"><div class="step-num">1</div><h3>Search & Filter</h3><p>Browse tutors by subject, location, price and availability. Read verified reviews from real students.</p></div>
+      <div class="step-card fade-up delay-1"><div class="step-num">2</div><h3>Book Instantly</h3><p>Send a session request and get matched. Choose online or in-person — your schedule, your choice.</p></div>
+      <div class="step-card fade-up delay-2"><div class="step-num">3</div><h3>Learn & Grow</h3><p>Attend your session, get help, then rate your tutor to keep quality high for everyone.</p></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="section-label">Platform Features</div>
+    <div class="section-title">Everything you need to succeed</div>
+    <div class="features">
+      <div class="feat"><div class="feat-icon">🔍</div><div><h4>Smart Tutor Matching</h4><p>Recommendations based on subject, level and location — just like a ride-hailing app.</p></div></div>
+      <div class="feat"><div class="feat-icon">✅</div><div><h4>Verified Profiles</h4><p>Every tutor is ID-verified and background-checked before appearing on the platform.</p></div></div>
+      <div class="feat"><div class="feat-icon">💬</div><div><h4>In-App Messaging</h4><p>Chat securely with your tutor to clarify topics and share notes before sessions.</p></div></div>
+      <div class="feat"><div class="feat-icon">📅</div><div><h4>Flexible Scheduling</h4><p>Book evenings, weekends or right before exams — whenever you need support.</p></div></div>
+      <div class="feat"><div class="feat-icon">📍</div><div><h4>Online & In-Person</h4><p>Sessions can be conducted via video call or at a physical location near you.</p></div></div>
+      <div class="feat"><div class="feat-icon">⭐</div><div><h4>Ratings & Reviews</h4><p>Transparent quality assurance — only students who attended sessions can leave reviews.</p></div></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section section-light">
+    <div class="section-label">Student Stories</div>
+    <div class="section-title">What students are saying</div>
+    <div class="testi-grid">
+      <div class="testi"><div class="t-stars">★★★★★</div><p class="t-text">"I was struggling with BGCSE maths and found a tutor within minutes. My grade went from D to B in one term."</p><div class="t-auth"><div class="t-av">👦🏾</div><div><div class="t-name">Lesego M.</div><div class="t-role">Form 4 Student, Gaborone</div></div></div></div>
+      <div class="testi"><div class="t-stars">★★★★★</div><p class="t-text">"ScholarConnect lets me earn income on my own schedule while helping younger students succeed."</p><div class="t-auth"><div class="t-av">👩🏽‍🎓</div><div><div class="t-name">Naledi K.</div><div class="t-role">UB Student & Tutor</div></div></div></div>
+      <div class="testi"><div class="t-stars">★★★★☆</div><p class="t-text">"Found a chemistry tutor for my daughter in under 10 minutes. The verification gave me real peace of mind."</p><div class="t-auth"><div class="t-av">👩🏾</div><div><div class="t-name">Mrs. Tau</div><div class="t-role">Parent, Francistown</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Ready to start learning?</h2>
+    <p>Join hundreds of students already getting help on ScholarConnect Botswana.</p>
+    <div class="hero-btns">
+      <a href="/register" class="btn btn-primary btn-lg">Create Free Account</a>
+      <a href="/find-tutor" class="btn btn-outline btn-lg">Browse Tutors</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 ScholarConnect Botswana. All rights reserved.</p>
+    <p>Made for Botswana 🇧🇼</p>
+  </footer>
+</div>
+
+<script src="/js/utils.js"></script>
+</body>
+</html>
