@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parent Dashboard — ScholarConnect</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary:#1a56db; --primary-dark:#1241a8; --primary-light:#e8f0fe;
+      --accent:#f59e0b; --success:#10b981; --danger:#ef4444;
+      --text:#111827; --muted:#6b7280; --border:#e5e7eb; --bg:#f8faff;
+      --sidebar:220px;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width:var(--sidebar); background:#fff; border-right:1px solid var(--border);
+      display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh;
+      z-index:100; transition:transform .3s;
+    }
+    .sidebar-brand {
+      padding:22px 20px 16px; font-size:1.3rem; font-weight:800; color:var(--primary);
+      border-bottom:1px solid var(--border); text-decoration:none; display:block;
+    }
+    .sidebar-brand span { color:var(--accent); }
+    .sidebar-role {
+      margin:12px 14px; padding:8px 12px; background:var(--primary-light);
+      border-radius:8px; font-size:.78rem; font-weight:700; color:var(--primary);
+    }
+    .sidebar-role i { margin-right:6px; }
+    .sidebar-nav { flex:1; padding:8px 12px; overflow-y:auto; }
+    .nav-item {
+      display:flex; align-items:center; gap:10px; padding:10px 12px;
+      border-radius:8px; cursor:pointer; font-size:.88rem; font-weight:600;
+      color:var(--muted); transition:all .15s; margin-bottom:2px; text-decoration:none;
+    }
+    .nav-item:hover { background:var(--primary-light); color:var(--primary); }
+    .nav-item.active { background:var(--primary); color:#fff; }
+    .nav-item .badge {
+      margin-left:auto; background:#ef4444; color:#fff;
+      font-size:.68rem; padding:2px 7px; border-radius:10px;
+    }
+    .nav-item.active .badge { background:rgba(255,255,255,.3); }
+    .sidebar-footer { padding:14px 16px; border-top:1px solid var(--border); }
+    .user-info { display:flex; align-items:center; gap:10px; }
+    .user-avatar {
+      width:34px; height:34px; background:var(--primary-light); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.9rem; color:var(--primary); font-weight:700; flex-shrink:0;
+    }
+    .user-name { font-size:.83rem; font-weight:700; }
+    .user-email { font-size:.72rem; color:var(--muted); }
+    .logout-btn {
+      margin-top:10px; width:100%; padding:8px; border:1.5px solid var(--border);
+      border-radius:8px; background:none; color:var(--muted); font-size:.82rem;
+      font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s;
+    }
+    .logout-btn:hover { border-color:var(--danger); color:var(--danger); }
+
+    /* MAIN */
+    .main { margin-left:var(--sidebar); flex:1; display:flex; flex-direction:column; }
+    .topbar {
+      background:#fff; border-bottom:1px solid var(--border);
+      padding:16px 28px; display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:50;
+    }
+    .topbar-title { font-size:1.1rem; font-weight:800; }
+    .topbar-actions { display:flex; gap:10px; align-items:center; }
+    .icon-btn {
+      width:38px; height:38px; border-radius:8px; border:1.5px solid var(--border);
+      background:#fff; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--muted); font-size:.9rem; transition:all .2s;
+    }
+    .icon-btn:hover { border-color:var(--primary); color:var(--primary); }
+    .content { padding:28px; flex:1; }
+
+    /* PANELS */
+    .panel { display:none; animation:fadeIn .3s ease both; }
+    .panel.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+    /* STATS ROW */
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+    .stat-card {
+      background:#fff; border-radius:14px; padding:20px;
+      border:1px solid var(--border);
+    }
+    .stat-icon {
+      width:40px; height:40px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; margin-bottom:12px;
+    }
+    .stat-val { font-size:1.6rem; font-weight:800; }
+    .stat-label { font-size:.78rem; color:var(--muted); font-weight:600; margin-top:2px; }
+
+    /* CHILDREN GRID */
+    .children-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+    .child-card {
+      background:#fff; border-radius:14px; border:1px solid var(--border);
+      padding:20px; position:relative;
+    }
+    .child-card-top { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .child-avatar {
+      width:44px; height:44px; border-radius:12px;
+      background:var(--primary-light); display:flex; align-items:center;
+      justify-content:center; font-size:1.3rem; flex-shrink:0;
+    }
+    .child-name { font-weight:800; font-size:.95rem; }
+    .child-meta { font-size:.78rem; color:var(--muted); margin-top:2px; }
+    .subject-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+    .subject-tag {
+      font-size:.72rem; font-weight:700; padding:3px 10px;
+      border-radius:20px; background:var(--primary-light); color:var(--primary);
+    }
+    .child-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .btn-sm-primary {
+      padding:8px 12px; background:var(--primary); color:#fff;
+      border:none; border-radius:8px; font-size:.8rem; font-weight:700;
+      cursor:pointer; font-family:inherit; transition:background .2s;
+    }
+    .btn-sm-primary:hover { background:var(--primary-dark); }
+    .btn-sm-outline {
+      padding:8px 12px; background:#fff; color:var(--primary);
+      border:1.5px solid var(--primary); border-radius:8px; font-size:.8rem;
+      font-weight:700; cursor:pointer; font-family:inherit; transition:all .2s;
+    }
+    .btn-sm-outline:hover { background:var(--primary-light); }
+    .add-child-card {
+      background:#fff; border-radius:14px;
+      border:2px dashed var(--border); padding:20px;
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; gap:8px; cursor:pointer;
+      min-height:160px; transition:all .2s;
+    }
+    .add-child-card:hover { border-color:var(--primary); background:var(--primary-light); }
+    .add-child-card i { font-size:1.6rem; color:var(--muted); }
+    .add-child-card span { font-size:.85rem; font-weight:600; color:var(--muted); }
+
+    /* TUTOR BROWSER */
+    .search-bar {
+      display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;
+    }
+    .search-input {
+      flex:1; min-width:200px; border:1.5px solid var(--border);
+      border-radius:10px; padding:10px 14px; font-size:.9rem;
+      font-family:inherit; outline:none;
+    }
+    .search-input:focus { border-color:var(--primary); }
+    .filter-select {
+      border:1.5px solid var(--border); border-radius:10px;
+      padding:10px 14px; font-size:.85rem; font-family:inherit;
+      outline:none; background:#fff;
+    }
+    .filter-select:focus { border-color:var(--primary); }
+    .tutors-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+    .tutor-card {
+      background:#fff; border-radius:14px; border:1px solid var(--border);
+      padding:20px; transition:box-shadow .2s;
+    }
+    .tutor-card:hover { box-shadow:0 4px 20px rgba(26,86,219,.1); }
+    .tutor-avatar {
+      width:52px; height:52px; border-radius:14px;
+      background:var(--primary-light); display:flex; align-items:center;
+      justify-content:center; font-size:1.4rem; margin-bottom:12px;
+    }
+    .tutor-name { font-weight:800; font-size:.95rem; margin-bottom:2px; }
+    .tutor-meta { font-size:.78rem; color:var(--muted); margin-bottom:10px; }
+    .tutor-rate { font-weight:700; color:var(--primary); font-size:.9rem; margin-bottom:12px; }
+    .stars { color:var(--accent); font-size:.78rem; margin-bottom:8px; }
+
+    /* PROGRESS */
+    .progress-section { margin-bottom:28px; }
+    .progress-section h3 { font-size:1rem; font-weight:800; margin-bottom:16px; }
+    .progress-card {
+      background:#fff; border-radius:14px; border:1px solid var(--border);
+      padding:20px; margin-bottom:14px;
+    }
+    .progress-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .progress-child { font-weight:800; font-size:.95rem; }
+    .progress-sessions { font-size:.8rem; color:var(--muted); }
+    .progress-subject { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .progress-subject-name { font-size:.82rem; font-weight:600; min-width:100px; }
+    .progress-bar-wrap { flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+    .progress-bar-fill { height:100%; border-radius:4px; background:var(--primary); transition:width .6s ease; }
+    .progress-pct { font-size:.78rem; font-weight:700; color:var(--muted); min-width:36px; text-align:right; }
+
+    /* BILLING */
+    .billing-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+    .billing-card {
+      background:#fff; border-radius:14px; border:1px solid var(--border);
+      padding:20px; text-align:center;
+    }
+    .billing-val { font-size:1.5rem; font-weight:800; color:var(--primary); }
+    .billing-label { font-size:.78rem; color:var(--muted); font-weight:600; margin-top:4px; }
+    .table-wrap { background:#fff; border-radius:14px; border:1px solid var(--border); overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    th { background:#f9fafb; padding:12px 16px; text-align:left; font-size:.78rem; color:var(--muted); font-weight:700; border-bottom:1px solid var(--border); }
+    td { padding:12px 16px; font-size:.83rem; border-bottom:1px solid var(--border); }
+    tr:last-child td { border-bottom:none; }
+    .badge-success { background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+    .badge-pending { background:#fef3c7; color:#92400e; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700; }
+
+    /* SECTION HEADERS */
+    .section-head {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:20px;
+    }
+    .section-title { font-size:1.1rem; font-weight:800; }
+    .section-action { font-size:.83rem; color:var(--primary); font-weight:600; cursor:pointer; }
+
+    /* MODAL */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,.4);
+      z-index:999; align-items:center; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+      background:#fff; border-radius:20px; padding:32px;
+      width:100%; max-width:480px; animation:fadeIn .3s ease both;
+    }
+    .modal-box h3 { font-size:1.2rem; font-weight:800; margin-bottom:20px; }
+    .modal-close {
+      float:right; background:none; border:none; font-size:1.2rem;
+      color:var(--muted); cursor:pointer; margin-top:-4px;
+    }
+    .form-group { margin-bottom:14px; }
+    .form-group label { display:block; font-size:.83rem; font-weight:600; margin-bottom:5px; }
+    .form-group select, .form-group input {
+      width:100%; border:1.5px solid var(--border); border-radius:8px;
+      padding:10px 12px; font-size:.88rem; font-family:inherit; outline:none;
+    }
+    .form-group select:focus, .form-group input:focus { border-color:var(--primary); }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a href="/" class="sidebar-brand">Scholar<span>Connect</span></a>
+  <div class="sidebar-role"><i class="fas fa-users"></i> Parent Account</div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" onclick="showPanel('overview')"><i class="fas fa-th-large"></i> Overview</a>
+    <a class="nav-item" onclick="showPanel('children')"><i class="fas fa-child"></i> My Children <span class="badge">2</span></a>
+    <a class="nav-item" onclick="showPanel('find')"><i class="fas fa-search"></i> Find a Tutor</a>
+    <a class="nav-item" onclick="showPanel('progress')"><i class="fas fa-chart-line"></i> Progress</a>
+    <a class="nav-item" onclick="showPanel('sessions')"><i class="fas fa-calendar-check"></i> Sessions</a>
+    <a class="nav-item" onclick="showPanel('billing')"><i class="fas fa-credit-card"></i> Billing</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar" id="userInitial">P</div>
+      <div>
+        <div class="user-name" id="userName">Parent</div>
+        <div class="user-email" id="userEmail">parent@email.com</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i> Log out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Overview</div>
+    <div class="topbar-actions">
+      <div class="icon-btn" title="Notifications"><i class="fas fa-bell"></i></div>
+      <div class="icon-btn" title="Messages"><i class="fas fa-envelope"></i></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#e8f0fe;"><i class="fas fa-child" style="color:var(--primary);"></i></div>
+          <div class="stat-val">2</div>
+          <div class="stat-label">Children Enrolled</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#d1fae5;"><i class="fas fa-calendar-check" style="color:var(--success);"></i></div>
+          <div class="stat-val">8</div>
+          <div class="stat-label">Sessions This Month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef3c7;"><i class="fas fa-star" style="color:var(--accent);"></i></div>
+          <div class="stat-val">4.8</div>
+          <div class="stat-label">Avg Tutor Rating</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fee2e2;"><i class="fas fa-wallet" style="color:var(--danger);"></i></div>
+          <div class="stat-val">P800</div>
+          <div class="stat-label">Spent This Month</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div class="section-title">Your Children</div>
+        <div class="section-action" onclick="showPanel('children')">View all →</div>
+      </div>
+      <div class="children-grid" style="margin-bottom:28px;">
+        <div class="child-card">
+          <div class="child-card-top">
+            <div class="child-avatar">👦</div>
+            <div>
+              <div class="child-name">Kgosi Molebatsi</div>
+              <div class="child-meta">BGCSE · Form 4 · Gaborone</div>
+            </div>
+          </div>
+          <div class="subject-tags">
+            <span class="subject-tag">Mathematics</span>
+            <span class="subject-tag">Sciences</span>
+            <span class="subject-tag">English</span>
+          </div>
+          <div class="child-actions">
+            <button class="btn-sm-primary" onclick="openBookModal('Kgosi')">Book Tutor</button>
+            <button class="btn-sm-outline" onclick="showPanel('progress')">Progress</button>
+          </div>
+        </div>
+        <div class="child-card">
+          <div class="child-card-top">
+            <div class="child-avatar">👧</div>
+            <div>
+              <div class="child-name">Naledi Molebatsi</div>
+              <div class="child-meta">JCE · Form 2 · Gaborone</div>
+            </div>
+          </div>
+          <div class="subject-tags">
+            <span class="subject-tag">Setswana</span>
+            <span class="subject-tag">English</span>
+          </div>
+          <div class="child-actions">
+            <button class="btn-sm-primary" onclick="openBookModal('Naledi')">Book Tutor</button>
+            <button class="btn-sm-outline" onclick="showPanel('progress')">Progress</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div class="section-title">Upcoming Sessions</div>
+        <div class="section-action" onclick="showPanel('sessions')">View all →</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Child</th><th>Tutor</th><th>Subject</th><th>Date & Time</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Kgosi</strong></td><td>Mr. Sithole</td><td>Mathematics</td><td>Today, 4:00 PM</td><td>Online</td><td><span class="badge-success">Confirmed</span></td></tr>
+            <tr><td><strong>Naledi</strong></td><td>Ms. Dlamini</td><td>English</td><td>Tomorrow, 2:00 PM</td><td>In-person</td><td><span class="badge-success">Confirmed</span></td></tr>
+            <tr><td><strong>Kgosi</strong></td><td>Mr. Sithole</td><td>Sciences</td><td>Fri, 5:00 PM</td><td>Online</td><td><span class="badge-pending">Pending</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHILDREN -->
+    <div class="panel" id="panel-children">
+      <div class="section-head">
+        <div class="section-title">My Children</div>
+        <button class="btn-sm-primary" onclick="openAddChildModal()"><i class="fas fa-plus me-1"></i> Add Child</button>
+      </div>
+      <div class="children-grid">
+        <div class="child-card">
+          <div class="child-card-top">
+            <div class="child-avatar">👦</div>
+            <div>
+              <div class="child-name">Kgosi Molebatsi</div>
+              <div class="child-meta">BGCSE · Form 4 · Gaborone Senior Secondary</div>
+            </div>
+          </div>
+          <div class="subject-tags">
+            <span class="subject-tag">Mathematics</span>
+            <span class="subject-tag">Sciences</span>
+            <span class="subject-tag">English</span>
+          </div>
+          <div style="font-size:.78rem; color:var(--muted); margin-bottom:12px;">4 sessions completed · Active tutor: Mr. Sithole</div>
+          <div class="child-actions">
+            <button class="btn-sm-primary" onclick="openBookModal('Kgosi')">Book Session</button>
+            <button class="btn-sm-outline">Edit Profile</button>
+          </div>
+        </div>
+        <div class="child-card">
+          <div class="child-card-top">
+            <div class="child-avatar">👧</div>
+            <div>
+              <div class="child-name">Naledi Molebatsi</div>
+              <div class="child-meta">JCE · Form 2 · Ramotswa Junior Secondary</div>
+            </div>
+          </div>
+          <div class="subject-tags">
+            <span class="subject-tag">Setswana</span>
+            <span class="subject-tag">English</span>
+          </div>
+          <div style="font-size:.78rem; color:var(--muted); margin-bottom:12px;">3 sessions completed · Active tutor: Ms. Dlamini</div>
+          <div class="child-actions">
+            <button class="btn-sm-primary" onclick="openBookModal('Naledi')">Book Session</button>
+            <button class="btn-sm-outline">Edit Profile</button>
+          </div>
+        </div>
+        <div class="add-child-card" onclick="openAddChildModal()">
+          <i class="fas fa-plus-circle"></i>
+          <span>Add another child</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIND A TUTOR -->
+    <div class="panel" id="panel-find">
+      <div class="search-bar">
+        <input class="search-input" placeholder="Search by name or subject..." oninput="filterTutors(this.value)"/>
+        <select class="filter-select" onchange="filterTutors()">
+          <option>All Subjects</option>
+          <option>Mathematics</option>
+          <option>English</option>
+          <option>Sciences</option>
+          <option>Setswana</option>
+        </select>
+        <select class="filter-select">
+          <option>All Levels</option>
+          <option>Primary</option>
+          <option>JCE</option>
+          <option>BGCSE</option>
+          <option>Tertiary</option>
+        </select>
+        <select class="filter-select" id="bookForChild">
+          <option value="">Booking for...</option>
+          <option>Kgosi</option>
+          <option>Naledi</option>
+        </select>
+      </div>
+      <div class="tutors-grid">
+        <div class="tutor-card">
+          <div class="tutor-avatar">👨‍🏫</div>
+          <div class="tutor-name">Mr. Sithole</div>
+          <div class="tutor-meta">Mathematics · BGCSE · Gaborone</div>
+          <div class="stars">★★★★★ <span style="color:var(--muted);">5.0</span></div>
+          <div class="tutor-rate">P100 / session</div>
+          <button class="btn-sm-primary" style="width:100%;" onclick="openBookModal('selected child')">Book for Child</button>
+        </div>
+        <div class="tutor-card">
+          <div class="tutor-avatar">👩‍🏫</div>
+          <div class="tutor-name">Ms. Dlamini</div>
+          <div class="tutor-meta">English · JCE & BGCSE · Gaborone</div>
+          <div class="stars">★★★★★ <span style="color:var(--muted);">4.9</span></div>
+          <div class="tutor-rate">P90 / session</div>
+          <button class="btn-sm-primary" style="width:100%;" onclick="openBookModal('selected child')">Book for Child</button>
+        </div>
+        <div class="tutor-card">
+          <div class="tutor-avatar">👨‍🔬</div>
+          <div class="tutor-name">Dr. Keabetswe</div>
+          <div class="tutor-meta">Sciences · BGCSE · Francistown</div>
+          <div class="stars">★★★★☆ <span style="color:var(--muted);">4.7</span></div>
+          <div class="tutor-rate">P120 / session</div>
+          <button class="btn-sm-primary" style="width:100%;" onclick="openBookModal('selected child')">Book for Child</button>
+        </div>
+        <div class="tutor-card">
+          <div class="tutor-avatar">👩‍🎓</div>
+          <div class="tutor-name">Ms. Maisela</div>
+          <div class="tutor-meta">Setswana · Primary & JCE · Gaborone</div>
+          <div class="stars">★★★★★ <span style="color:var(--muted);">4.8</span></div>
+          <div class="tutor-rate">P80 / session</div>
+          <button class="btn-sm-primary" style="width:100%;" onclick="openBookModal('selected child')">Book for Child</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="panel" id="panel-progress">
+      <div class="progress-section">
+        <h3>👦 Kgosi Molebatsi — BGCSE Progress</h3>
+        <div class="progress-card">
+          <div class="progress-head">
+            <span class="progress-child">Subject Progress</span>
+            <span class="progress-sessions">4 sessions completed</span>
+          </div>
+          <div class="progress-subject">
+            <span class="progress-subject-name">Mathematics</span>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:72%"></div></div>
+            <span class="progress-pct">72%</span>
+          </div>
+          <div class="progress-subject">
+            <span class="progress-subject-name">Sciences</span>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:58%; background:var(--accent);"></div></div>
+            <span class="progress-pct">58%</span>
+          </div>
+          <div class="progress-subject">
+            <span class="progress-subject-name">English</span>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:81%; background:var(--success);"></div></div>
+            <span class="progress-pct">81%</span>
+          </div>
+        </div>
+      </div>
+      <div class="progress-section">
+        <h3>👧 Naledi Molebatsi — JCE Progress</h3>
+        <div class="progress-card">
+          <div class="progress-head">
+            <span class="progress-child">Subject Progress</span>
+            <span class="progress-sessions">3 sessions completed</span>
+          </div>
+          <div class="progress-subject">
+            <span class="progress-subject-name">Setswana</span>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:65%;"></div></div>
+            <span class="progress-pct">65%</span>
+          </div>
+          <div class="progress-subject">
+            <span class="progress-subject-name">English</span>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:77%; background:var(--success);"></div></div>
+            <span class="progress-pct">77%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SESSIONS -->
+    <div class="panel" id="panel-sessions">
+      <div class="section-head">
+        <div class="section-title">All Sessions</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Child</th><th>Tutor</th><th>Subject</th><th>Date & Time</th><th>Type</th><th>Cost</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Kgosi</strong></td><td>Mr. Sithole</td><td>Mathematics</td><td>Today, 4:00 PM</td><td>Online</td><td>P100</td><td><span class="badge-success">Confirmed</span></td></tr>
+            <tr><td><strong>Naledi</strong></td><td>Ms. Dlamini</td><td>English</td><td>Tomorrow, 2:00 PM</td><td>In-person</td><td>P90</td><td><span class="badge-success">Confirmed</span></td></tr>
+            <tr><td><strong>Kgosi</strong></td><td>Mr. Sithole</td><td>Sciences</td><td>Fri, 5:00 PM</td><td>Online</td><td>P100</td><td><span class="badge-pending">Pending</span></td></tr>
+            <tr><td><strong>Kgosi</strong></td><td>Mr. Sithole</td><td>Mathematics</td><td>Last Mon</td><td>Online</td><td>P100</td><td><span class="badge-success">Completed</span></td></tr>
+            <tr><td><strong>Naledi</strong></td><td>Ms. Dlamini</td><td>Setswana</td><td>Last Wed</td><td>In-person</td><td>P80</td><td><span class="badge-success">Completed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="panel" id="panel-billing">
+      <div class="billing-summary">
+        <div class="billing-card">
+          <div class="billing-val">P800</div>
+          <div class="billing-label">Spent This Month</div>
+        </div>
+        <div class="billing-card">
+          <div class="billing-val">8</div>
+          <div class="billing-label">Sessions Paid</div>
+        </div>
+        <div class="billing-card">
+          <div class="billing-val">P100</div>
+          <div class="billing-label">Avg Session Cost</div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-bottom:16px;">Transaction History</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Child</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Apr 10</td><td>Kgosi</td><td>Mr. Sithole</td><td>Mathematics</td><td>P100</td><td><span class="badge-success">Paid</span></td></tr>
+            <tr><td>Apr 9</td><td>Naledi</td><td>Ms. Dlamini</td><td>Setswana</td><td>P80</td><td><span class="badge-success">Paid</span></td></tr>
+            <tr><td>Apr 7</td><td>Kgosi</td><td>Mr. Sithole</td><td>Sciences</td><td>P100</td><td><span class="badge-success">Paid</span></td></tr>
+            <tr><td>Apr 5</td><td>Naledi</td><td>Ms. Dlamini</td><td>English</td><td>P90</td><td><span class="badge-success">Paid</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- BOOK SESSION MODAL -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('bookModal')">×</button>
+    <h3>Book a Session</h3>
+    <div class="form-group">
+      <label>Booking for</label>
+      <select id="bookForSelect">
+        <option>Kgosi</option>
+        <option>Naledi</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Subject</label>
+      <select>
+        <option>Mathematics</option>
+        <option>English</option>
+        <option>Sciences</option>
+        <option>Setswana</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Preferred Date</label>
+      <input type="date"/>
+    </div>
+    <div class="form-group">
+      <label>Preferred Time</label>
+      <select>
+        <option>Morning (8–12)</option>
+        <option>Afternoon (12–5)</option>
+        <option>Evening (5–8)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Session Type</label>
+      <select>
+        <option>Online</option>
+        <option>In-person</option>
+      </select>
+    </div>
+    <button class="btn-sm-primary" style="width:100%; padding:12px; font-size:.9rem;" onclick="confirmBooking()">
+      Confirm Booking
+    </button>
+  </div>
+</div>
+
+<!-- ADD CHILD MODAL -->
+<div class="modal-overlay" id="addChildModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('addChildModal')">×</button>
+    <h3>Add a Child Profile</h3>
+    <div class="form-group">
+      <label>Child's Full Name</label>
+      <input type="text" placeholder="e.g. Keabetswe Molebatsi"/>
+    </div>
+    <div class="form-group">
+      <label>School / Institution</label>
+      <input type="text" placeholder="e.g. Gaborone Senior Secondary"/>
+    </div>
+    <div class="form-group">
+      <label>Current Level</label>
+      <select>
+        <option>Primary (Std 1–7)</option>
+        <option>JCE (Form 1–3)</option>
+        <option>BGCSE (Form 4–5)</option>
+        <option>Tertiary</option>
+      </select>
+    </div>
+    <button class="btn-sm-primary" style="width:100%; padding:12px;" onclick="closeModal('addChildModal')">
+      Add Child Profile
+    </button>
+  </div>
+</div>
+
+<script>
+  // Load user info
+  const user = JSON.parse(localStorage.getItem('sc_user') || '{}');
+  if (user.name) {
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('userEmail').textContent = user.email || '';
+    document.getElementById('userInitial').textContent = user.name.charAt(0).toUpperCase();
+  }
+
+  const panelTitles = {
+    overview:'Overview', children:'My Children', find:'Find a Tutor',
+    progress:'Progress', sessions:'Sessions', billing:'Billing'
+  };
+
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + name + "'")) n.classList.add('active');
+    });
+    document.getElementById('topbarTitle').textContent = panelTitles[name] || '';
+  }
+
+  function openBookModal(childName) {
+    document.getElementById('bookForSelect').value = childName;
+    document.getElementById('bookModal').classList.add('open');
+  }
+  function openAddChildModal() { document.getElementById('addChildModal').classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  function confirmBooking() {
+    closeModal('bookModal');
+    showToast('Session request sent!', 'success');
+    showPanel('sessions');
+  }
+
+  function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;background:${type==='success'?'#10b981':'#1a56db'};color:#fff;padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:700;z-index:9999;animation:fadeIn .3s ease;`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  function logout() {
+    localStorage.removeItem('sc_user');
+    window.location.href = '/';
+  }
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+</script>
+</body>
+</html>

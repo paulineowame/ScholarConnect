@@ -1,114 +1,818 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Account — ScholarConnect</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join ScholarConnect</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
-    body { background: var(--card); }
-    .reg-wrap {
+    :root {
+      --primary: #1a56db;
+      --primary-dark: #1241a8;
+      --primary-light: #e8f0fe;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f8faff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
       min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 100px 20px 60px;
+      display: flex;
+      flex-direction: column;
     }
-    .reg-header { text-align: center; margin-bottom: 52px; }
-    .reg-header .logo { font-size: 1.7rem; margin-bottom: 24px; display: block; }
-    .reg-header h2 { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--navy); margin-bottom: 10px; }
-    .reg-header p { color: var(--muted); font-size: 0.97rem; }
 
-    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 760px; width: 100%; }
+    /* NAV */
+    nav {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand { font-size: 1.4rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+    .nav-brand span { color: var(--accent); }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; margin-left: 24px; }
+    .nav-links a:hover { color: var(--primary); }
 
-    .choice-card {
-      background: var(--white);
+    /* MAIN LAYOUT */
+    .page-wrap {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 20px 60px;
+    }
+    .register-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 40px rgba(26,86,219,.08);
+      width: 100%;
+      max-width: 580px;
+      padding: 44px 48px;
+      animation: fadeUp .4s ease both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    .register-title {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .register-sub {
+      color: var(--muted);
+      font-size: .92rem;
+      margin-bottom: 28px;
+    }
+
+    /* ROLE SELECTOR */
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .role-btn {
       border: 2px solid var(--border);
-      border-radius: 24px;
-      padding: 44px 36px;
-      text-align: center;
-      text-decoration: none;
-      display: flex; flex-direction: column; align-items: center;
-      transition: all 0.3s;
+      border-radius: 12px;
+      padding: 16px 8px;
       cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+      background: #fff;
+      position: relative;
     }
-    .choice-card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 20px 60px rgba(37,87,167,0.13); }
-    .choice-card.student:hover { border-color: var(--accent); }
-    .choice-card.tutor:hover   { border-color: var(--gold); }
+    .role-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+    .role-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .role-btn.active .role-check { display: flex; }
+    .role-check {
+      display: none;
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 18px; height: 18px;
+      background: var(--primary);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+    }
+    .role-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .role-label { font-size: .82rem; font-weight: 700; color: var(--text); }
+    .role-desc { font-size: .72rem; color: var(--muted); margin-top: 3px; }
 
-    .choice-icon { font-size: 3.5rem; margin-bottom: 20px; width: 88px; height: 88px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .choice-card.student .choice-icon { background: var(--light); }
-    .choice-card.tutor   .choice-icon { background: #fef9c3; }
+    /* STEP INDICATOR */
+    .steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 0;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+    .step.active .step-num { border-color: var(--primary); background: var(--primary); color: #fff; }
+    .step.done .step-num { border-color: var(--success); background: var(--success); color: #fff; }
+    .step-label { font-size: .78rem; color: var(--muted); font-weight: 600; }
+    .step.active .step-label { color: var(--primary); }
+    .step.done .step-label { color: var(--success); }
+    .step-line { height: 2px; background: var(--border); flex: 1; margin: 0 8px; transition: background .3s; }
+    .step-line.done { background: var(--success); }
 
-    .choice-card h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--navy); margin-bottom: 10px; }
-    .choice-card p  { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 28px; }
+    /* FORM FIELDS */
+    .form-section { display: none; }
+    .form-section.active { display: block; animation: fadeIn .3s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
 
-    .choice-bullets { list-style: none; text-align: left; width: 100%; margin-bottom: 32px; display: flex; flex-direction: column; gap: 8px; }
-    .choice-bullets li { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text); }
-    .choice-bullets li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: .83rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: .9rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      transition: border-color .2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,86,219,.1); }
+    .form-group textarea { resize: vertical; min-height: 90px; }
 
-    .choice-btn { display: block; width: 100%; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 0.95rem; font-family: 'DM Sans', sans-serif; border: none; cursor: pointer; transition: all 0.2s; }
-    .choice-card.student .choice-btn { background: var(--accent); color: var(--white); }
-    .choice-card.student .choice-btn:hover { background: var(--mid); }
-    .choice-card.tutor .choice-btn   { background: var(--gold); color: var(--navy); }
-    .choice-card.tutor .choice-btn:hover { background: #d97706; color: var(--white); }
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .85rem; }
+    .input-icon-wrap input { padding-left: 38px; }
 
-    .login-link { margin-top: 36px; text-align: center; color: var(--muted); font-size: 0.88rem; }
-    .login-link a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    /* SUBJECTS GRID */
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .subject-chip {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+      user-select: none;
+    }
+    .subject-chip:hover { border-color: var(--primary); color: var(--primary); }
+    .subject-chip.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
 
-    @media (max-width: 600px) { .choice-grid { grid-template-columns: 1fr; } }
+    /* CHILD PROFILE CARD */
+    .child-card {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      background: #fafbff;
+    }
+    .child-card-head {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    .remove-child {
+      position: absolute;
+      top: 12px; right: 14px;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: .8rem;
+      background: none;
+      border: none;
+    }
+    .add-child-btn {
+      width: 100%;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      transition: all .2s;
+      margin-top: 4px;
+    }
+    .add-child-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* FILE UPLOAD */
+    .file-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+    .file-upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+    .file-upload-area input[type=file] { position: absolute; inset:0; opacity:0; cursor:pointer; }
+    .file-upload-area i { font-size: 1.4rem; color: var(--muted); margin-bottom: 6px; }
+    .file-upload-area p { font-size: .8rem; color: var(--muted); margin: 0; }
+    .file-upload-area .file-name { font-size: .8rem; color: var(--primary); font-weight: 600; margin-top: 4px; }
+
+    /* BUTTONS */
+    .btn-primary-custom {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s, transform .1s;
+      margin-top: 8px;
+    }
+    .btn-primary-custom:hover { background: var(--primary-dark); }
+    .btn-primary-custom:active { transform: scale(.98); }
+    .btn-back {
+      width: 100%;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+      margin-top: 8px;
+    }
+    .btn-back:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    .login-link a { color: var(--primary); font-weight: 600; text-decoration: none; }
+
+    /* SUCCESS */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+      animation: fadeIn .4s ease both;
+    }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: #d1fae5;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+      color: var(--success);
+    }
+    .success-screen h2 { font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .success-screen p { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
+
+    /* TUTOR-ONLY FIELD */
+    .tutor-only, .parent-only, .student-only { display: none; }
+
+    /* TOAST */
+    .toast-wrap { position: fixed; bottom: 28px; right: 28px; z-index: 9999; }
+    .toast-msg {
+      background: var(--text);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: .85rem;
+      font-weight: 600;
+      animation: fadeUp .3s ease both;
+      margin-top: 8px;
+    }
+    .toast-msg.success { background: var(--success); }
+    .toast-msg.error { background: #ef4444; }
+
+    @media (max-width: 560px) {
+      .register-card { padding: 28px 20px; }
+      .form-row { grid-template-columns: 1fr; }
+      .subjects-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
 
 <nav>
-  <a href="/" class="logo">Scholar<span>Connect</span></a>
-  <ul class="nav-links">
-    <li><a href="/">Home</a></li>
-    <li><a href="/login">Sign In</a></li>
-  </ul>
+  <a href="/" class="nav-brand">Scholar<span>Connect</span></a>
+  <div class="nav-links">
+    <a href="/find-tutor">Find a Tutor</a>
+    <a href="/login">Login</a>
+  </div>
 </nav>
 
-<div class="reg-wrap">
-  <div class="reg-header fade-up">
-    <h2>Create Your Account</h2>
-    <p>Choose how you want to use ScholarConnect</p>
+<div class="page-wrap">
+  <div class="register-card">
+
+    <!-- FORM CONTENT -->
+    <div id="formArea">
+      <h1 class="register-title">Create your account</h1>
+      <p class="register-sub">Choose who you are to get started — you can always update your profile later.</p>
+
+      <!-- ROLE SELECTOR -->
+      <div class="role-selector">
+        <div class="role-btn" id="roleStudent" onclick="selectRole('student')">
+          <div class="role-check"><i class="fas fa-check"></i></div>
+          <div class="role-icon">🎓</div>
+          <div class="role-label">Student</div>
+          <div class="role-desc">I need a tutor</div>
+        </div>
+        <div class="role-btn" id="roleParent" onclick="selectRole('parent')">
+          <div class="role-check"><i class="fas fa-check"></i></div>
+          <div class="role-icon">👪</div>
+          <div class="role-label">Parent</div>
+          <div class="role-desc">Booking for my child</div>
+        </div>
+        <div class="role-btn" id="roleTutor" onclick="selectRole('tutor')">
+          <div class="role-check"><i class="fas fa-check"></i></div>
+          <div class="role-icon">📚</div>
+          <div class="role-label">Tutor</div>
+          <div class="role-desc">I want to teach</div>
+        </div>
+      </div>
+
+      <!-- STEP INDICATOR -->
+      <div class="steps" id="stepIndicator" style="display:none;">
+        <div class="step active" id="step1">
+          <div class="step-num">1</div>
+          <div class="step-label" id="step1label">Personal Info</div>
+        </div>
+        <div class="step-line" id="line1"></div>
+        <div class="step active" id="step2" style="opacity:.4;">
+          <div class="step-num">2</div>
+          <div class="step-label" id="step2label">Details</div>
+        </div>
+        <div class="step-line" id="line2" style="display:none;"></div>
+        <div class="step" id="step3" style="display:none; opacity:.4;">
+          <div class="step-num">3</div>
+          <div class="step-label" id="step3label">Preferences</div>
+        </div>
+      </div>
+
+      <!-- STEP 1: PERSONAL INFO (all roles) -->
+      <div class="form-section active" id="s1">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-user"></i>
+              <input type="text" id="firstName" placeholder="e.g. Thabo"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="lastName" placeholder="e.g. Kgosi"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="you@example.com"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-phone"></i>
+            <input type="tel" id="phone" placeholder="+267 7X XXX XXX"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="At least 8 characters"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="confirmPassword" placeholder="Repeat password"/>
+          </div>
+        </div>
+        <button class="btn-primary-custom" onclick="goToStep2()">Continue <i class="fas fa-arrow-right ms-1"></i></button>
+      </div>
+
+      <!-- STEP 2A: STUDENT DETAILS -->
+      <div class="form-section" id="s2_student">
+        <div class="form-group">
+          <label>School / Institution</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-school"></i>
+            <input type="text" id="school" placeholder="e.g. Gaborone Senior Secondary"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Current Level</label>
+            <select id="studentLevel">
+              <option value="">Select level</option>
+              <option>Primary (Std 1–7)</option>
+              <option>Junior Secondary (Form 1–3 / JCE)</option>
+              <option>Senior Secondary (Form 4–5 / BGCSE)</option>
+              <option>Tertiary / University</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>City / Town</label>
+            <select id="studentCity">
+              <option value="">Select city</option>
+              <option>Gaborone</option>
+              <option>Francistown</option>
+              <option>Maun</option>
+              <option>Serowe</option>
+              <option>Palapye</option>
+              <option>Lobatse</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Subjects I need help with</label>
+          <div class="subjects-grid" id="studentSubjects">
+            <div class="subject-chip" onclick="toggleChip(this)">Mathematics</div>
+            <div class="subject-chip" onclick="toggleChip(this)">English</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Sciences</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Setswana</div>
+            <div class="subject-chip" onclick="toggleChip(this)">History</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Geography</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Business</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Accounting</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Computer Sci</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Preferred session type</label>
+          <select id="studentSessionType">
+            <option value="">Select preference</option>
+            <option>Online only</option>
+            <option>In-person only</option>
+            <option>Both (flexible)</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack()"><i class="fas fa-arrow-left me-1"></i> Back</button>
+          <button class="btn-primary-custom" style="margin-top:0;" onclick="submitForm()">Create Account <i class="fas fa-check ms-1"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 2B: PARENT DETAILS -->
+      <div class="form-section" id="s2_parent">
+        <div class="form-group">
+          <label>City / Town</label>
+          <select id="parentCity">
+            <option value="">Select city</option>
+            <option>Gaborone</option>
+            <option>Francistown</option>
+            <option>Maun</option>
+            <option>Serowe</option>
+            <option>Palapye</option>
+            <option>Lobatse</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preferred session type</label>
+          <select id="parentSessionType">
+            <option value="">Select preference</option>
+            <option>Online only</option>
+            <option>In-person only</option>
+            <option>Both (flexible)</option>
+          </select>
+        </div>
+
+        <div style="font-size:.85rem; font-weight:700; color:var(--text); margin-bottom:12px;">
+          <i class="fas fa-child me-1" style="color:var(--primary);"></i> Child Profiles
+          <span style="font-weight:400; color:var(--muted); font-size:.8rem;"> — add each child you'd like to book for</span>
+        </div>
+
+        <div id="childrenContainer"></div>
+        <button class="add-child-btn" onclick="addChild()">
+          <i class="fas fa-plus me-1"></i> Add a Child
+        </button>
+
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn-back" onclick="goBack()"><i class="fas fa-arrow-left me-1"></i> Back</button>
+          <button class="btn-primary-custom" style="margin-top:0;" onclick="submitForm()">Create Account <i class="fas fa-check ms-1"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 2C: TUTOR DETAILS -->
+      <div class="form-section" id="s2_tutor">
+        <div class="form-row">
+          <div class="form-group">
+            <label>City / Town</label>
+            <select id="tutorCity">
+              <option value="">Select city</option>
+              <option>Gaborone</option>
+              <option>Francistown</option>
+              <option>Maun</option>
+              <option>Serowe</option>
+              <option>Palapye</option>
+              <option>Lobatse</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Hourly Rate (BWP)</label>
+            <div class="input-icon-wrap">
+              <i class="fas fa-tag"></i>
+              <input type="number" id="tutorRate" placeholder="e.g. 100"/>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Highest Qualification</label>
+          <select id="tutorQual">
+            <option value="">Select qualification</option>
+            <option>BGCSE</option>
+            <option>Certificate / Diploma</option>
+            <option>Bachelor's Degree (in progress)</option>
+            <option>Bachelor's Degree (completed)</option>
+            <option>Master's Degree or above</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Subjects I can teach</label>
+          <div class="subjects-grid">
+            <div class="subject-chip" onclick="toggleChip(this)">Mathematics</div>
+            <div class="subject-chip" onclick="toggleChip(this)">English</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Sciences</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Setswana</div>
+            <div class="subject-chip" onclick="toggleChip(this)">History</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Geography</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Business</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Accounting</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Computer Sci</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Levels you can teach</label>
+          <div class="subjects-grid">
+            <div class="subject-chip" onclick="toggleChip(this)">Primary</div>
+            <div class="subject-chip" onclick="toggleChip(this)">JCE</div>
+            <div class="subject-chip" onclick="toggleChip(this)">BGCSE</div>
+            <div class="subject-chip" onclick="toggleChip(this)">Tertiary</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Upload Certificate / ID (optional)</label>
+          <div class="file-upload-area" id="uploadArea">
+            <input type="file" accept=".pdf,.jpg,.png" onchange="showFileName(this)"/>
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Drag & drop or click to upload</p>
+            <p>PDF, JPG or PNG · max 5MB</p>
+            <div class="file-name" id="fileName"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Short bio (optional)</label>
+          <textarea id="tutorBio" placeholder="Tell students a little about yourself, your experience and teaching style..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack()"><i class="fas fa-arrow-left me-1"></i> Back</button>
+          <button class="btn-primary-custom" style="margin-top:0;" onclick="submitForm()">Submit Application <i class="fas fa-check ms-1"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h2 id="successTitle">You're in!</h2>
+      <p id="successMsg">Your account has been created. Let's get started.</p>
+      <a id="successBtn" href="#" class="btn-primary-custom" style="display:inline-block; text-decoration:none; padding:13px 32px; max-width:280px;">
+        Go to Dashboard
+      </a>
+    </div>
+
+    <div class="login-link" id="loginLinkWrap">
+      Already have an account? <a href="/login">Log in</a>
+    </div>
   </div>
-
-  <div class="choice-grid fade-up delay-1">
-
-    <!-- STUDENT -->
-    <a href="/register/student" class="choice-card student">
-      <div class="choice-icon">🎒</div>
-      <h3>I'm a Student</h3>
-      <p>Find verified tutors and get the academic help you need — on your schedule.</p>
-      <ul class="choice-bullets">
-        <li>Search tutors by subject & location</li>
-        <li>Book sessions online or in-person</li>
-        <li>Rate and review your tutors</li>
-        <li>Free to join</li>
-      </ul>
-      <span class="choice-btn">Register as Student →</span>
-    </a>
-
-    <!-- TUTOR -->
-    <a href="/register/tutor" class="choice-card tutor">
-      <div class="choice-icon">👩🏾‍🏫</div>
-      <h3>I'm a Tutor</h3>
-      <p>Share your knowledge, earn flexible income and build a student base across Botswana.</p>
-      <ul class="choice-bullets">
-        <li>Set your own rates & availability</li>
-        <li>Get matched with students instantly</li>
-        <li>Build a verified tutor profile</li>
-        <li>Avg. P2,500/month earnings</li>
-      </ul>
-      <span class="choice-btn">Register as Tutor →</span>
-    </a>
-
-  </div>
-
-  <p class="login-link fade-up delay-2">Already have an account? <a href="/login">Sign in here</a></p>
 </div>
 
-<script src="/js/utils.js"></script>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  let currentRole = null;
+  let currentStep = 1;
+  let childCount = 0;
+
+  function selectRole(role) {
+    currentRole = role;
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('role' + role.charAt(0).toUpperCase() + role.slice(1)).classList.add('active');
+
+    // Update step indicator labels
+    const labels = {
+      student: ['Personal Info', 'Academic Info'],
+      parent:  ['Personal Info', 'Children'],
+      tutor:   ['Personal Info', 'Qualifications']
+    };
+    document.getElementById('step1label').textContent = labels[role][0];
+    document.getElementById('step2label').textContent = labels[role][1];
+    document.getElementById('stepIndicator').style.display = 'flex';
+    document.getElementById('step3').style.display = 'none';
+    document.getElementById('line2').style.display = 'none';
+
+    // Mark step 1 active, step 2 pending
+    setStepState(1, 'active');
+    setStepState(2, 'pending');
+  }
+
+  function setStepState(n, state) {
+    const el = document.getElementById('step' + n);
+    el.classList.remove('active', 'done');
+    el.style.opacity = state === 'pending' ? '0.4' : '1';
+    if (state === 'active') el.classList.add('active');
+    if (state === 'done') el.classList.add('done');
+    if (n > 1) {
+      const line = document.getElementById('line' + (n - 1));
+      if (line) line.classList.toggle('done', state === 'done');
+    }
+  }
+
+  function goToStep2() {
+    if (!currentRole) { showToast('Please select your account type above', 'error'); return; }
+    const first = document.getElementById('firstName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pass  = document.getElementById('password').value;
+    const conf  = document.getElementById('confirmPassword').value;
+    if (!first || !email) { showToast('Please fill in all required fields', 'error'); return; }
+    if (pass.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+    if (pass !== conf) { showToast('Passwords do not match', 'error'); return; }
+
+    // Hide step 1, show role-specific step 2
+    document.getElementById('s1').classList.remove('active');
+    document.getElementById('s2_' + currentRole).classList.add('active');
+
+    // Add first child card for parents
+    if (currentRole === 'parent' && childCount === 0) addChild();
+
+    setStepState(1, 'done');
+    setStepState(2, 'active');
+    currentStep = 2;
+  }
+
+  function goBack() {
+    document.getElementById('s2_' + currentRole).classList.remove('active');
+    document.getElementById('s1').classList.add('active');
+    setStepState(1, 'active');
+    setStepState(2, 'pending');
+    currentStep = 1;
+  }
+
+  function addChild() {
+    childCount++;
+    const c = childCount;
+    const container = document.getElementById('childrenContainer');
+    const card = document.createElement('div');
+    card.className = 'child-card';
+    card.id = 'child_' + c;
+    card.innerHTML = `
+      <div class="child-card-head"><i class="fas fa-child me-1"></i> Child ${c}</div>
+      <button class="remove-child" onclick="removeChild(${c})" title="Remove"><i class="fas fa-times"></i></button>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Child's Name</label>
+          <input type="text" placeholder="Full name"/>
+        </div>
+        <div class="form-group">
+          <label>School Level</label>
+          <select>
+            <option value="">Select</option>
+            <option>Primary (Std 1–7)</option>
+            <option>JCE (Form 1–3)</option>
+            <option>BGCSE (Form 4–5)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Subjects needed</label>
+        <div class="subjects-grid">
+          <div class="subject-chip" onclick="toggleChip(this)">Mathematics</div>
+          <div class="subject-chip" onclick="toggleChip(this)">English</div>
+          <div class="subject-chip" onclick="toggleChip(this)">Sciences</div>
+          <div class="subject-chip" onclick="toggleChip(this)">Setswana</div>
+          <div class="subject-chip" onclick="toggleChip(this)">History</div>
+          <div class="subject-chip" onclick="toggleChip(this)">Geography</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+
+  function removeChild(n) {
+    const card = document.getElementById('child_' + n);
+    if (card) card.remove();
+  }
+
+  function toggleChip(el) {
+    el.classList.toggle('selected');
+  }
+
+  function showFileName(input) {
+    const name = input.files[0]?.name || '';
+    document.getElementById('fileName').textContent = name;
+  }
+
+  function submitForm() {
+    const email = document.getElementById('email').value.trim();
+    const first = document.getElementById('firstName').value.trim();
+
+    // Store session
+    const userData = {
+      name: first + ' ' + (document.getElementById('lastName').value.trim()),
+      email: email,
+      role: currentRole
+    };
+    localStorage.setItem('sc_user', JSON.stringify(userData));
+
+    // Send to server
+    fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    }).catch(() => {}); // prototype — ignore errors
+
+    // Show success
+    document.getElementById('formArea').style.display = 'none';
+    document.getElementById('loginLinkWrap').style.display = 'none';
+
+    const successMsgs = {
+      student: { title: "You're registered!", msg: "Welcome to ScholarConnect. Find your first tutor and get started.", btn: '/dashboard/student' },
+      parent:  { title: "Account created!", msg: "Your parent account is ready. Manage your children's tutoring from your dashboard.", btn: '/dashboard/parent' },
+      tutor:   { title: "Application submitted!", msg: "Thank you for applying. Your profile will be reviewed and you'll be notified shortly.", btn: '/dashboard/tutor' }
+    };
+    const s = successMsgs[currentRole];
+    document.getElementById('successTitle').textContent = s.title;
+    document.getElementById('successMsg').textContent = s.msg;
+    document.getElementById('successBtn').href = s.btn;
+    document.getElementById('successScreen').style.display = 'block';
+  }
+
+  function showToast(msg, type = 'info') {
+    const wrap = document.getElementById('toastWrap');
+    const t = document.createElement('div');
+    t.className = 'toast-msg ' + type;
+    t.textContent = msg;
+    wrap.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  // Pre-select role from URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const preRole = urlParams.get('role');
+  if (preRole && ['student','parent','tutor'].includes(preRole)) selectRole(preRole);
+</script>
 </body>
 </html>

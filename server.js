@@ -1,76 +1,51 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Simple in-memory "database" for prototype
-const db = {
-  users: [],
-  tutors: []
-};
+function sendView(res, file) {
+  res.sendFile(path.join(__dirname, 'views', file));
+}
 
-// ── ROUTES ──
+// Public routes
+app.get('/',               (req, res) => sendView(res, 'index.html'));
+app.get('/login',          (req, res) => sendView(res, 'login.html'));
+app.get('/register',       (req, res) => sendView(res, 'register.html'));
+app.get('/find-tutor',     (req, res) => sendView(res, 'find-tutor.html'));
 
-// Pages
-app.get('/',          (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
-app.get('/login',     (req, res) => res.sendFile(path.join(__dirname, 'views', 'login.html')));
-app.get('/register',  (req, res) => res.sendFile(path.join(__dirname, 'views', 'register.html')));
-app.get('/register/student', (req, res) => res.sendFile(path.join(__dirname, 'views', 'register-student.html')));
-app.get('/register/tutor',   (req, res) => res.sendFile(path.join(__dirname, 'views', 'register-tutor.html')));
-app.get('/find-tutor',(req, res) => res.sendFile(path.join(__dirname, 'views', 'find-tutor.html')));
-app.get('/dashboard/student', (req, res) => res.sendFile(path.join(__dirname, 'views', 'dashboard-student.html')));
-app.get('/dashboard/tutor',   (req, res) => res.sendFile(path.join(__dirname, 'views', 'dashboard-tutor.html')));
+// Dashboard routes
+app.get('/dashboard/student', (req, res) => sendView(res, 'dashboard-student.html'));
+app.get('/dashboard/tutor',   (req, res) => sendView(res, 'dashboard-tutor.html'));
+app.get('/dashboard/parent',  (req, res) => sendView(res, 'dashboard-parent.html'));
 
-// API — Student registration
-app.post('/api/register/student', (req, res) => {
-  const { firstName, lastName, email, password, level, city } = req.body;
-  if (!firstName || !email || !password) {
-    return res.json({ success: false, message: 'Please fill in all required fields.' });
-  }
-  if (db.users.find(u => u.email === email)) {
-    return res.json({ success: false, message: 'An account with this email already exists.' });
-  }
-  const user = { id: Date.now(), type: 'student', firstName, lastName, email, level, city, createdAt: new Date() };
-  db.users.push(user);
-  res.json({ success: true, message: 'Student account created!', user });
+// In-memory user store (prototype)
+const users = [];
+
+// Register endpoint
+app.post('/register', (req, res) => {
+  const { name, email, role } = req.body;
+  if (!email || !role) return res.status(400).json({ error: 'Missing fields' });
+  if (users.find(u => u.email === email)) return res.status(409).json({ error: 'Email already registered' });
+  users.push({ name, email, role, createdAt: new Date() });
+  console.log(`[ScholarConnect] New ${role} registered: ${email}`);
+  res.json({ success: true, role });
 });
 
-// API — Tutor registration
-app.post('/api/register/tutor', (req, res) => {
-  const { firstName, lastName, email, password, qualification, institution, city, rate, subjects } = req.body;
-  if (!firstName || !email || !password || !rate) {
-    return res.json({ success: false, message: 'Please fill in all required fields.' });
-  }
-  if (db.users.find(u => u.email === email)) {
-    return res.json({ success: false, message: 'An account with this email already exists.' });
-  }
-  const tutor = { id: Date.now(), type: 'tutor', firstName, lastName, email, qualification, institution, city, rate, subjects, status: 'pending', createdAt: new Date() };
-  db.users.push(tutor);
-  db.tutors.push(tutor);
-  res.json({ success: true, message: 'Tutor application submitted!', user: tutor });
-});
-
-// API — Login
-app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
-  const user = db.users.find(u => u.email === email);
-  if (!user) return res.json({ success: false, message: 'No account found with that email.' });
-  // Prototype: accept any password
-  res.json({ success: true, user });
-});
-
-// API — Get tutors list
-app.get('/api/tutors', (req, res) => {
-  res.json(db.tutors);
+// Login endpoint
+app.post('/login', (req, res) => {
+  const { email, role } = req.body;
+  const user = users.find(u => u.email === email);
+  if (!user) return res.status(404).json({ error: 'No account found' });
+  if (role && user.role !== role) return res.status(403).json({ error: 'wrong_role', actualRole: user.role });
+  res.json({ success: true, role: user.role, name: user.name });
 });
 
 app.listen(PORT, () => {
-  console.log(`\n  ScholarConnect running at http://localhost:${PORT}\n`);
+  console.log(`ScholarConnect running on http://localhost:${PORT}`);
+  console.log(`Business contact: scholarconnect@outlook.com`);
 });
