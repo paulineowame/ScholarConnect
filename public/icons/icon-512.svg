@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0f1f3d"/>
+  <path d="M156 370 Q256 340 256 340 Q256 340 356 370 L356 440 Q256 415 256 415 Q256 415 156 440 Z" fill="#e8dcc8"/>
+  <rect x="251" y="338" width="10" height="110" fill="#c8b89a"/>
+  <path d="M150 365 Q156 358 162 358 L251 338 L251 448 L162 468 Q154 468 150 462 Z" fill="#1a56db"/>
+  <path d="M362 365 Q356 358 350 358 L261 338 L261 448 L350 468 Q358 468 362 462 Z" fill="#1a56db"/>
+  <rect x="222" y="222" width="36" height="6" rx="3" fill="#d4a820"/>
+  <rect x="110" y="200" width="110" height="72" rx="22" fill="none" stroke="#d4a820" stroke-width="7"/>
+  <rect x="116" y="206" width="98" height="60" rx="18" fill="#1a56db" opacity="0.3"/>
+  <text x="165" y="248" text-anchor="middle" font-family="Georgia,serif" font-size="36" font-weight="700" fill="#ffffff">S</text>
+  <rect x="292" y="200" width="110" height="72" rx="22" fill="none" stroke="#d4a820" stroke-width="7"/>
+  <rect x="298" y="206" width="98" height="60" rx="18" fill="#1a56db" opacity="0.3"/>
+  <text x="347" y="248" text-anchor="middle" font-family="Georgia,serif" font-size="36" font-weight="700" fill="#ffffff">C</text>
+  <path d="M110 232 Q82 232 76 244" fill="none" stroke="#d4a820" stroke-width="5" stroke-linecap="round"/>
+  <path d="M402 232 Q430 232 436 244" fill="none" stroke="#d4a820" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="347,120 400,142 347,164 294,142" fill="#d4a820"/>
+  <polygon points="347,120 400,142 347,142 294,142" fill="#f0c040"/>
+  <line x1="400" y1="142" x2="410" y2="170" stroke="#d4a820" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="410" cy="176" r="6" fill="#d4a820"/>
+  <ellipse cx="347" cy="164" rx="26" ry="10" fill="#1a3a7a"/>
+  <rect x="321" y="154" width="52" height="16" fill="#1a3a7a"/>
+  <ellipse cx="347" cy="154" rx="26" ry="10" fill="#22509a"/>
+</svg>

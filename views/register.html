@@ -336,6 +336,25 @@
       .subjects-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#1a56db"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="ScholarConnect"/>
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg"/>
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    }
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      window._deferredPrompt = e;
+      const btn = document.getElementById('installBtn');
+      if(btn){ btn.style.display = 'flex'; btn.onclick = () => { e.prompt(); }; }
+    });
+  </script>
 </head>
 <body>
 
@@ -814,5 +833,9 @@
   const preRole = urlParams.get('role');
   if (preRole && ['student','parent','tutor'].includes(preRole)) selectRole(preRole);
 </script>
+
+  <div id="installBtn" style="display:none;position:fixed;bottom:24px;right:24px;background:#1a56db;color:#fff;padding:12px 20px;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;align-items:center;gap:10px;z-index:9999;box-shadow:0 4px 20px rgba(26,86,219,.35);">
+    <span style="font-size:1.1rem;">&#x2B07;</span> Install App
+  </div>
 </body>
 </html>
